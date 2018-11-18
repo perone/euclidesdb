@@ -1,0 +1,69 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "euclidesdb.proto";
+option java_outer_classname = "EuclidesProto";
+
+package euclidesproto;
+
+message FindSimilarRequest {
+    int32 top_k = 1;
+    bytes image_data = 2;
+    repeated string models = 3;
+}
+
+message SearchResults {
+    repeated int32 top_k_ids = 1;
+    repeated float distances = 2;
+    string model = 3;
+}
+
+message FindSimilarReply {
+    repeated SearchResults results = 1;
+}
+
+message AddImageRequest {
+    int32 image_id = 1;
+    bytes image_data = 2;
+    bytes image_metadata = 3;
+    repeated string models = 4;
+}
+
+message RemoveImageRequest {
+    int32 image_id = 1;
+}
+
+message RemoveImageReply {
+    int32 image_id = 1;
+}
+
+message ItemVectors {
+    string model = 1;
+    repeated float predictions = 2;
+    repeated float features = 3;
+}
+
+message ItemData {
+    int32 item_id = 1;
+    bytes metadata = 2;
+    repeated ItemVectors vectors = 3;
+}
+
+message AddImageReply {
+    repeated ItemVectors vectors = 1;
+}
+
+message ShutdownRequest {
+    int32 shutdown_type = 1;
+}
+
+message ShutdownReply {
+    bool shutdown = 1;
+}
+
+service Similar {
+    rpc Shutdown (ShutdownRequest) returns (ShutdownReply) {}
+    rpc FindSimilar (FindSimilarRequest) returns (FindSimilarReply) {}
+    rpc AddImage (AddImageRequest) returns (AddImageReply) {}
+    rpc RemoveImage (RemoveImageRequest) returns (RemoveImageReply) {}
+}

@@ -1,0 +1,212 @@
+#include "similarservice.hpp"
+
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
+
+#include <easylogging++.h>
+
+torch::Tensor image_from_memory(const std::string &data)
+{
+    const int size = static_cast<int>(data.size());
+    int x=0, y=0, c=0;
+
+    const stbi_uc *raw_data = reinterpret_cast<const stbi_uc*>(data.data());
+    unsigned char *pixel_data = stbi_load_from_memory(raw_data,
+                                                      size, &x, &y, &c, 0);
+    if(pixel_data == nullptr)
+        return torch::Tensor();
+
+    torch::Tensor tensor = torch::CPU(torch::kByte).tensorFromBlob(pixel_data, {y, x, c});
+    torch::Tensor ftensor = tensor.to(torch::kFloat);
+    stbi_image_free(pixel_data);
+
+    // Pre-processing (and training assumption) for all models
+    ftensor = ftensor.permute({2, 0, 1});
+    ftensor.unsqueeze_(0);
+    ftensor.div_(255.0);
+
+    return ftensor;
+}
+
+SimilarServiceImpl::SimilarServiceImpl(const TorchManager::TorchManagerPtr &torch_manager,
+                                       const DatabaseManager::DatabaseManagerPtr &database_manager,
+                                       const SearchEngine::SearchEnginePtr &search_engine,
+                                       std::promise<ShutdownType> shutdown_request)
+: Similar::Service(),
+  mTorchManager(torch_manager),
+  mDatabaseManager(database_manager),
+  mSearchEngine(search_engine),
+  mShutdownRequest(std::move(shutdown_request))
+{ }
+
+grpc::Status SimilarServiceImpl::FindSimilar(grpc::ServerContext* context,
+        const FindSimilarRequest* request, FindSimilarReply* reply)
+{
+    TIMED_SCOPE(timerFindSimilar, "FindSimilar");
+
+    // TODO: refactor to return a bool instead of undefined tensor
+    // upon failure.
+    torch::Tensor image_tensor = image_from_memory(request->image_data());
+    if(image_tensor.type_id() == torch::UndefinedTensorId())
+    {
+        LOG(ERROR) << "Undefined tensor, cannot parse image data.";
+        return grpc::Status(grpc::StatusCode::CANCELLED,
+                            "Undefined tensor, cannot parse image data.");
+    }
+
+    torch::Tensor var_image_tensor = torch::autograd::make_variable(image_tensor);
+    std::vector<torch::jit::IValue> net_inputs;
+    net_inputs.push_back(var_image_tensor);
+
+    for(const string &model_name : request->models())
+    {
+        LOG(INFO) << "Search in model space " << model_name;
+
+        auto torch_module = mTorchManager->getModule(model_name);
+        PERFORMANCE_CHECKPOINT_WITH_ID(timerFindSimilar, "BeforeInference");
+        auto ival = torch_module->forward(net_inputs);
+        PERFORMANCE_CHECKPOINT_WITH_ID(timerFindSimilar, "AfterInference");
+        auto elements = ival.toTuple()->elements();
+
+        const at::Tensor &preds = elements[0].toTensor();
+        const at::Tensor &features = elements[1].toTensor();
+
+        LOG(INFO) << "Prediction Size: " << preds.sizes();
+        LOG(INFO) << "Feature Size: " << features.sizes();
+
+        if(!preds.is_contiguous() || !features.is_contiguous())
+        {
+            const string error_msg = "Predictions and features should be contiguous.";
+            LOG(ERROR) << error_msg;
+            return grpc::Status(grpc::StatusCode::CANCELLED, error_msg);
+        }
+
+        vector<int> toplist;
+        vector<float> distances;
+        mSearchEngine->search(model_name, features, request->top_k(),
+                              &toplist, &distances);
+
+        LOG(INFO) << "Search on " << model_name
+                  << " returned " << toplist.size() << " results.";
+
+        SearchResults *search_results = reply->add_results();
+        search_results->set_model(model_name);
+
+        google::protobuf::RepeatedField<int> rf_topk(toplist.begin(), toplist.end());
+        search_results->mutable_top_k_ids()->Swap(&rf_topk);
+
+        google::protobuf::RepeatedField<float> rf_distances(distances.begin(), distances.end());
+        search_results->mutable_distances()->Swap(&rf_distances);
+    }
+
+    return grpc::Status::OK;
+}
+
+grpc::Status
+SimilarServiceImpl::AddImage(grpc::ServerContext *context,
+        const AddImageRequest *request, AddImageReply *reply)
+{
+    TIMED_SCOPE(timerAddImage, "AddImage");
+
+    const std::string &image_data = request->image_data();
+    torch::Tensor image_tensor = image_from_memory(image_data);
+    if(image_tensor.type_id() == torch::UndefinedTensorId())
+    {
+        LOG(ERROR) << "Undefined tensor, cannot parse image data.";
+        return grpc::Status(grpc::StatusCode::CANCELLED,
+                            "Undefined tensor, cannot parse image data.");
+    }
+
+    torch::Tensor var_image = torch::autograd::make_variable(image_tensor);
+    std::vector<torch::jit::IValue> inputs;
+    inputs.push_back(var_image);
+
+    ItemData item_data;
+    item_data.set_item_id(request->image_id());
+    item_data.set_metadata(request->image_metadata());
+
+    // For each model
+    for(int i=0; i < request->models_size(); i++)
+    {
+        const string &model_name = request->models(i);
+        const TorchManager::torchmodule_t &module = mTorchManager->getModule(model_name);
+
+        LOG(INFO) << "Adding image for the " << model_name << " model space.";
+
+        PERFORMANCE_CHECKPOINT_WITH_ID(timerAddImage, "BeforeInference");
+        auto ival = module->forward(inputs);
+        PERFORMANCE_CHECKPOINT_WITH_ID(timerAddImage, "AfterInference");
+        auto elements = ival.toTuple()->elements();
+
+        if(elements.size() != 2)
+            LOG(ERROR) << "Model " << model_name << "is generating more than 2 outputs";
+
+        const at::Tensor &predictions = elements[0].toTensor();
+        const at::Tensor &features = elements[1].toTensor();
+
+        LOG(INFO) << "Prediction Shape : " << predictions.sizes();
+        LOG(INFO) << "Features Shape   : " << features.sizes();
+
+        if(predictions.sizes()[0] != 1)
+            LOG(ERROR) << "Model " << model_name << " is generating wrong prediction shape";
+
+        if(features.sizes()[0] != 1)
+            LOG(ERROR) << "Model " << model_name << " is generating wrong feature shape";
+
+        const float *raw_predictions = predictions[0].data<float>();
+        const float *raw_features = features[0].data<float>();
+
+        ItemVectors *reply_vectors = reply->add_vectors();
+        ItemVectors *item_vectors = item_data.add_vectors();
+        item_vectors->set_model(model_name);
+        reply_vectors->set_model(model_name);
+
+        const int64_t preds_size = predictions.sizes()[1];
+        google::protobuf::RepeatedField<float> rf_preds(raw_predictions,
+                                                        raw_predictions+preds_size);
+        reply_vectors->mutable_predictions()->CopyFrom(rf_preds);
+        item_vectors->mutable_predictions()->Swap(&rf_preds);
+
+        const int64_t features_size = features.sizes()[1];
+        google::protobuf::RepeatedField<float> rf_feats(raw_features,
+                                                        raw_features+features_size);
+        reply_vectors->mutable_features()->CopyFrom(rf_feats);
+        item_vectors->mutable_features()->Swap(&rf_feats);
+    }
+
+    const bool ret = mDatabaseManager->addItemData(item_data);
+    if(!ret)
+    {
+        LOG(ERROR) << "Error adding item data into database.";
+        return grpc::Status::CANCELLED;
+    }
+
+    return grpc::Status::OK;
+}
+
+grpc::Status SimilarServiceImpl::RemoveImage(grpc::ServerContext *context, const RemoveImageRequest *request,
+                                             RemoveImageReply *reply)
+{
+    TIMED_SCOPE(timerRemoveImage, "RemoveImage");
+
+    const bool ret = mDatabaseManager->removeItem(request->image_id());
+    if(!ret)
+    {
+        LOG(ERROR) << "Error removing item from database.";
+        return grpc::Status::CANCELLED;
+    }
+
+    // Return the same id
+    reply->set_image_id(request->image_id());
+    return grpc::Status::OK;
+}
+
+grpc::Status
+SimilarServiceImpl::Shutdown(grpc::ServerContext *context, const ShutdownRequest *request, ShutdownReply *reply)
+{
+    TIMED_SCOPE(timerRemoveImage, "Shutdown");
+    ShutdownType shutdown_type = static_cast<ShutdownType>(request->shutdown_type());
+    mShutdownRequest.set_value(shutdown_type);
+    reply->set_shutdown(true);
+    return grpc::Status::OK;
+}

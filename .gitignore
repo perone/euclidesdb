@@ -1,0 +1,10 @@
+*.pth
+cmake-build-debug/
+.idea/
+db/
+__pycache__/
+*.pyc
+.DS_Store
+build/
+*.log
+
