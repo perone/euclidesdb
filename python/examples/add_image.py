@@ -24,9 +24,14 @@ def run_main():
 
     with euclides.Channel("localhost", 50000) as channel:
         db = euclides.EuclidesDB(channel)
-        ret = db.add_image(image_id, ["resnet18"], image)
+        ret_add = db.add_image(image_id, ["resnet18"], image)
 
-    predictions = ret.vectors[0].predictions
+        # After finishing adding items, you need to tell
+        # the database to refresh the indexes to add newly
+        # indexed items.
+        db.refresh_index()
+
+    predictions = ret_add.vectors[0].predictions
     print("Preds Len: ", len(predictions))
 
     # Category should be 281: 'tabby, tabby cat' for cat.jpg
