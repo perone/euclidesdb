@@ -10,7 +10,7 @@ The easiest way to execute EuclidesDB on any system is to use `Docker <https://w
 
     docker run -p 50000:50000 \
         -v ~/database:/database \
-        -it euclidesdb/euclidesdb:0.1.0
+        -it euclidesdb/euclidesdb
 
 This command will host EuclidesDB on the local port 50000 (for RPC calls) and it will store the database data into the host (local) folder `~/database`.
 

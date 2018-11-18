@@ -15,11 +15,11 @@ RUN apt-get update && apt-get install -y \
     \
     chmod +x ~/fetch_linux_amd64 && \
     ~/fetch_linux_amd64 --repo="https://github.com/perone/euclidesdb" \
-                        --tag="v0.1.0" \
-                        --release-asset="euclidesdb-0.1.0-Linux.tar.gz" /opt && \
-    tar zxvf euclidesdb-0.1.0-Linux.tar.gz && rm -rf euclidesdb-0.1.0-Linux.tar.gz
+                        --tag="v0.1.1" \
+                        --release-asset="euclidesdb-0.1.1-Linux.tar.gz" /opt && \
+    tar zxvf euclidesdb-0.1.1-Linux.tar.gz && rm -rf euclidesdb-0.1.1-Linux.tar.gz
 
-WORKDIR /opt/euclidesdb-0.1.0-Linux/euclidesdb
+WORKDIR /opt/euclidesdb-0.1.1-Linux/euclidesdb
 
 # PyTorch
 ARG PYTHON_VERSION=3.6
@@ -37,8 +37,8 @@ RUN curl -o ~/miniconda.sh -O  https://repo.continuum.io/miniconda/Miniconda3-la
      rm -rf ~/.torch && \
      rm -rf ~/.cache
 
-COPY euclidesdb.conf /opt/euclidesdb-0.1.0-Linux/euclidesdb
-COPY bootstrap_euclidesdb.sh /opt/euclidesdb-0.1.0-Linux/euclidesdb
+COPY euclidesdb.conf /opt/euclidesdb-0.1.1-Linux/euclidesdb
+COPY bootstrap_euclidesdb.sh /opt/euclidesdb-0.1.1-Linux/euclidesdb
 
-ENTRYPOINT ["/opt/euclidesdb-0.1.0-Linux/euclidesdb/bootstrap_euclidesdb.sh"]
+ENTRYPOINT ["/opt/euclidesdb-0.1.1-Linux/euclidesdb/bootstrap_euclidesdb.sh"]
 EXPOSE 50000
