@@ -23,6 +23,7 @@ EuclidesDB is a multi-model machine learning feature database that is tight coup
    :maxdepth: 4
    :caption: Contents:
 
+   changelog
    getstarted
    installation
    configuration
