@@ -1,0 +1,4 @@
+Pillow>=5.3.0
+grpcio>=1.15.0
+grpcio-tools>=1.15.0
+protobuf>=3.6.1

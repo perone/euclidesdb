@@ -22,7 +22,7 @@ class VGG16Feature(vgg.VGG):
 
         self.classifier_final = nn.Sequential(
             nn.Linear(4096, num_classes),
-            nn.Softmax(dim=0),
+            nn.Softmax(dim=1),
         )
 
         if init_weights:

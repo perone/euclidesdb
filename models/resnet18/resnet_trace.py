@@ -1,10 +1,10 @@
 from torchvision.models import resnet
 import torch.utils.model_zoo as model_zoo
 
-import torchvision
 import torch
 
 import torch.nn.functional as F
+
 
 class ResnetFeature(resnet.ResNet):
     def forward(self, x):
@@ -21,7 +21,7 @@ class ResnetFeature(resnet.ResNet):
         x = self.avgpool(x)
         x_feat = x.view(x.size(0), -1)
         x = self.fc(x_feat)
-        x = F.softmax(x, dim=0)
+        x = F.softmax(x, dim=1)
 
         return x, x_feat
 
