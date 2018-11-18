@@ -16,6 +16,8 @@ A simple use case that might make the EuclidesDB role clear is the case where yo
 
 EuclidesDB tries to solve some issues in this context by providing a very simple standalone server that can store, build indexes and serve requests using efficient serialization (protobuf) and protocols (gRPC+HTTP2) with an easy API that can be consumed in many different languages thanks to gRPC. It offers APIs for including new data into its database and quering it later, it also provised a very tight integration with PyTorch, where the libtorch is used as the backend to run traced models, providing a very easy pipeline to integrate new models (written and trained in Python) into the EuclidesDB C++ backend.
 
+.. note:: For the moment, only binaries with CPU support are available, GPU support will be implemented soon.
+
 Concepts
 -------------------------------------------------------------------------------
 There are two main concepts in EuclidesDB:
