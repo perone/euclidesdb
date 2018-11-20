@@ -88,6 +88,7 @@ html_theme_options = {
     'logo': 'img/logo.png',
     'github_user': 'perone',
     'github_repo': 'euclidesdb',
+    'github_type': 'star',
     'github_button': True,
     'github_banner': False,
     'logo_name': False,
