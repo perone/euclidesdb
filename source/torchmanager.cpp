@@ -22,12 +22,14 @@ void TorchManager::addModule(const string &module_name,
     LOG(INFO) << "Module " << module_name << " loaded.";
 }
 
-TorchManager::torchmodule_t TorchManager::getModule(const string &module_name) const
+bool TorchManager::getModule(const std::string &module_name, torchmodule_t &module) const
 {
     modulemap_t::const_iterator pair = mModuleMap.find(module_name);
     if(pair == mModuleMap.end())
-        LOG(FATAL) << "Module " << module_name << " not found.";
-    return pair->second;
+        return false;
+
+    module = pair->second;
+    return true;
 }
 
 void TorchManager::populateFromDir(const string &dirname)

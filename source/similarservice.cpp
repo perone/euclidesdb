@@ -5,6 +5,17 @@
 
 #include <easylogging++.h>
 
+/**
+ * Log and return a gRPC error.
+ * @param error_msg the error message to report and return to client
+ * @return the gRPC status object with the code and message
+ */
+inline grpc::Status euclides_grpc_error(const std::string &error_msg)
+{
+    LOG(ERROR) << error_msg;
+    return grpc::Status(grpc::StatusCode::CANCELLED, error_msg);
+}
+
 torch::Tensor image_from_memory(const std::string &data)
 {
     const int size = static_cast<int>(data.size());
@@ -48,11 +59,7 @@ grpc::Status SimilarServiceImpl::FindSimilar(grpc::ServerContext* context,
     // upon failure.
     torch::Tensor image_tensor = image_from_memory(request->image_data());
     if(image_tensor.type_id() == torch::UndefinedTensorId())
-    {
-        LOG(ERROR) << "Undefined tensor, cannot parse image data.";
-        return grpc::Status(grpc::StatusCode::CANCELLED,
-                            "Undefined tensor, cannot parse image data.");
-    }
+        return euclides_grpc_error("Undefined tensor, cannot parse image data.");
 
     torch::Tensor var_image_tensor = torch::autograd::make_variable(image_tensor);
     std::vector<torch::jit::IValue> net_inputs;
@@ -62,7 +69,11 @@ grpc::Status SimilarServiceImpl::FindSimilar(grpc::ServerContext* context,
     {
         LOG(INFO) << "Search in model space " << model_name;
 
-        auto torch_module = mTorchManager->getModule(model_name);
+        TorchManager::torchmodule_t torch_module;
+        const bool ret = mTorchManager->getModule(model_name, torch_module);
+        if(!ret)
+            return euclides_grpc_error("Cannot find the module: " + model_name);
+
         PERFORMANCE_CHECKPOINT_WITH_ID(timerFindSimilar, "BeforeInference");
         auto ival = torch_module->forward(net_inputs);
         PERFORMANCE_CHECKPOINT_WITH_ID(timerFindSimilar, "AfterInference");
@@ -75,11 +86,7 @@ grpc::Status SimilarServiceImpl::FindSimilar(grpc::ServerContext* context,
         LOG(INFO) << "Feature Size: " << features.sizes();
 
         if(!preds.is_contiguous() || !features.is_contiguous())
-        {
-            const string error_msg = "Predictions and features should be contiguous.";
-            LOG(ERROR) << error_msg;
-            return grpc::Status(grpc::StatusCode::CANCELLED, error_msg);
-        }
+            return euclides_grpc_error("Predictions and features should be contiguous.");
 
         vector<int> toplist;
         vector<float> distances;
@@ -111,11 +118,7 @@ SimilarServiceImpl::AddImage(grpc::ServerContext *context,
     const std::string &image_data = request->image_data();
     torch::Tensor image_tensor = image_from_memory(image_data);
     if(image_tensor.type_id() == torch::UndefinedTensorId())
-    {
-        LOG(ERROR) << "Undefined tensor, cannot parse image data.";
-        return grpc::Status(grpc::StatusCode::CANCELLED,
-                            "Undefined tensor, cannot parse image data.");
-    }
+        return euclides_grpc_error("Undefined tensor, cannot parse image data.");
 
     torch::Tensor var_image = torch::autograd::make_variable(image_tensor);
     std::vector<torch::jit::IValue> inputs;
@@ -129,7 +132,10 @@ SimilarServiceImpl::AddImage(grpc::ServerContext *context,
     for(int i=0; i < request->models_size(); i++)
     {
         const string &model_name = request->models(i);
-        const TorchManager::torchmodule_t &module = mTorchManager->getModule(model_name);
+        TorchManager::torchmodule_t module;
+        const bool ret = mTorchManager->getModule(model_name, module);
+        if(!ret)
+            return euclides_grpc_error("Cannot find the module: " + model_name);
 
         LOG(INFO) << "Adding image for the " << model_name << " model space.";
 
@@ -176,10 +182,7 @@ SimilarServiceImpl::AddImage(grpc::ServerContext *context,
 
     const bool ret = mDatabaseManager->addItemData(item_data);
     if(!ret)
-    {
-        LOG(ERROR) << "Error adding item data into database.";
-        return grpc::Status::CANCELLED;
-    }
+        return euclides_grpc_error("Error adding item data into database.");
 
     return grpc::Status::OK;
 }
