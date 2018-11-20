@@ -6,11 +6,19 @@ import euclides
 from PIL import Image
 import numpy as np
 
-from torchvision.transforms import functional as F
+
+def center_crop(image, new_height, new_width):
+   height, width = image.size
+   left = np.ceil((width - new_width)/2.)
+   top = np.ceil((height - new_height)/2.)
+   right = np.floor((width + new_width)/2.)
+   bottom = np.floor((height + new_height)/2.)
+   return image.crop((left, top, right, bottom))
 
 
 def run_main():
-    parser = argparse.ArgumentParser(description='Add a new image into database.')
+    parser = argparse.ArgumentParser(
+        description='Add a new image into database.')
     parser.add_argument('--id', dest='image_id', type=int, required=True,
                         help='ID of the image to add into EuclidesDB.')
     parser.add_argument('--file', dest='filename', type=str, required=True,
@@ -20,7 +28,7 @@ def run_main():
     image = Image.open(args.filename)
     image_id = int(args.image_id)
     image.thumbnail((300, 300), Image.ANTIALIAS)
-    image = F.center_crop(image, 224)
+    image = center_crop(image, 224, 224)
 
     with euclides.Channel("localhost", 50000) as channel:
         db = euclides.EuclidesDB(channel)
