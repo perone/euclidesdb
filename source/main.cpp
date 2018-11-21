@@ -18,6 +18,7 @@
 #include "torchmanager.hpp"
 #include "databasemanager.hpp"
 #include "searchengine.hpp"
+#include "se_annoy.hpp"
 
 #include <easylogging++.h>
 

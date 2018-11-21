@@ -65,7 +65,7 @@ grpc::Status SimilarServiceImpl::FindSimilar(grpc::ServerContext* context,
     std::vector<torch::jit::IValue> net_inputs;
     net_inputs.push_back(var_image_tensor);
 
-    for(const string &model_name : request->models())
+    for(const std::string &model_name : request->models())
     {
         LOG(INFO) << "Search in model space " << model_name;
 
@@ -88,8 +88,8 @@ grpc::Status SimilarServiceImpl::FindSimilar(grpc::ServerContext* context,
         if(!preds.is_contiguous() || !features.is_contiguous())
             return euclides_grpc_error("Predictions and features should be contiguous.");
 
-        vector<int> toplist;
-        vector<float> distances;
+        std::vector<int> toplist;
+        std::vector<float> distances;
         mSearchEngine->search(model_name, features, request->top_k(),
                               &toplist, &distances);
 
@@ -131,7 +131,7 @@ SimilarServiceImpl::AddImage(grpc::ServerContext *context,
     // For each model
     for(int i=0; i < request->models_size(); i++)
     {
-        const string &model_name = request->models(i);
+        const std::string &model_name = request->models(i);
         TorchManager::torchmodule_t module;
         const bool ret = mTorchManager->getModule(model_name, module);
         if(!ret)
