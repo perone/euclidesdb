@@ -1,4 +1,3 @@
-import sys
 import argparse
 
 import euclides
@@ -6,7 +5,14 @@ import euclides
 from PIL import Image
 import numpy as np
 
-from torchvision.transforms import functional as F
+
+def center_crop(image, new_height, new_width):
+    height, width = image.size
+    left = np.ceil((width - new_width)/2.)
+    top = np.ceil((height - new_height)/2.)
+    right = np.floor((width + new_width)/2.)
+    bottom = np.floor((height + new_height)/2.)
+    return image.crop((left, top, right, bottom))
 
 
 def run_main():
@@ -19,7 +25,7 @@ def run_main():
 
     image = Image.open(args.filename)
     image.thumbnail((300, 300), Image.ANTIALIAS)
-    image = F.center_crop(image, 224)
+    image = center_crop(image, 224, 224)
 
     with euclides.Channel("localhost", 50000) as channel:
         db = euclides.EuclidesDB(channel)

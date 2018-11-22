@@ -1,4 +1,3 @@
-import sys
 import argparse
 
 import euclides
@@ -8,12 +7,12 @@ import numpy as np
 
 
 def center_crop(image, new_height, new_width):
-   height, width = image.size
-   left = np.ceil((width - new_width)/2.)
-   top = np.ceil((height - new_height)/2.)
-   right = np.floor((width + new_width)/2.)
-   bottom = np.floor((height + new_height)/2.)
-   return image.crop((left, top, right, bottom))
+    height, width = image.size
+    left = np.ceil((width - new_width)/2.)
+    top = np.ceil((height - new_height)/2.)
+    right = np.floor((width + new_width)/2.)
+    bottom = np.floor((height + new_height)/2.)
+    return image.crop((left, top, right, bottom))
 
 
 def run_main():
