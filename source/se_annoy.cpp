@@ -30,7 +30,7 @@ void SEAnnoy::setup()
     mIdMapping.clear();
     mIdMapping.reserve(mTorchManager->size());
 
-    vector<string> model_list = mTorchManager->getModuleList();
+    std::vector<std::string> model_list = mTorchManager->getModuleList();
     for(const std::string &model_name : model_list)
     {
         index_id_counter[model_name] = 0;

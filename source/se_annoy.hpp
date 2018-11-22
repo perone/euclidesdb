@@ -17,7 +17,7 @@ public:
 
     void setup() override;
 
-    void search(const string &model_name,
+    void search(const std::string &model_name,
                 const torch::Tensor &features_tensor,
                 int top_k, std::vector<int> *top_ids,
                 std::vector<float> *distances) override;
