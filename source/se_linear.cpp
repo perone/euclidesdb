@@ -26,8 +26,10 @@ struct IdDistance
 
 
 SELinear::SELinear(const TorchManager::TorchManagerPtr &torch_manager,
-                   const DatabaseManager::DatabaseManagerPtr &database_manager)
-: SearchEngine(torch_manager, database_manager)
+                   const DatabaseManager::DatabaseManagerPtr &database_manager,
+                   bool normalize, int norm)
+: SearchEngine(torch_manager, database_manager),
+  mNormalize(normalize), mPnorm(norm)
 { }
 
 void SELinear::setup()
@@ -77,10 +79,19 @@ SELinear::search(const std::string &model_name,
                 continue;
             }
 
-            // TODO: add option for enabling/disabling normalization
-            const torch::Tensor norm_db_tensor = tensor / tensor.norm();
-            const torch::Tensor norm_search_tensor = squeeze_tensor / squeeze_tensor.norm();
-            const float distance = norm_db_tensor.dist(norm_search_tensor, 2).item<float>();
+            float distance = 0.0;
+
+            // Should we normalize vectors ?
+            if(mNormalize)
+            {
+                const torch::Tensor norm_db_tensor = tensor / tensor.norm();
+                const torch::Tensor norm_search_tensor = squeeze_tensor / squeeze_tensor.norm();
+                distance = norm_db_tensor.dist(norm_search_tensor, mPnorm).item<float>();
+            }
+            else
+            {
+                distance = tensor.dist(squeeze_tensor, mPnorm).item<float>();
+            }
 
             const IdDistance id_dist(item_data.item_id(), distance);
             if(pri_queue.size() < top_k || id_dist < pri_queue.top())
@@ -92,6 +103,8 @@ SELinear::search(const std::string &model_name,
         }
     }
 
+    // Pop from the heap to the returning list of top-k ids
+    // and distances.
     while (!pri_queue.empty()) {
         const IdDistance &item_dist = pri_queue.top();
         top_ids->push_back(item_dist.mId);
