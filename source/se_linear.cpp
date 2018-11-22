@@ -99,3 +99,8 @@ SELinear::search(const std::string &model_name,
         pri_queue.pop();
     }
 }
+
+bool SELinear::requireRefresh()
+{
+    return false;
+}

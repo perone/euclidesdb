@@ -15,6 +15,7 @@ public:
     SearchEngine(const TorchManager::TorchManagerPtr &torch_manager,
                  const DatabaseManager::DatabaseManagerPtr &database_manager);
     virtual void setup() = 0;
+    virtual bool requireRefresh() = 0;
 
     virtual void search(const std::string &model_name,
                         const torch::Tensor &features_tensor,

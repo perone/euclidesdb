@@ -84,3 +84,8 @@ SEAnnoy::search(const std::string &model_name,
     for(auto &item : *top_ids)
         item = id_mapping[item];
 }
+
+bool SEAnnoy::requireRefresh()
+{
+    return true;
+}

@@ -218,6 +218,19 @@ SimilarServiceImpl::Shutdown(grpc::ServerContext *context, const ShutdownRequest
 {
     TIMED_SCOPE(timerRemoveImage, "Shutdown");
     ShutdownType shutdown_type = static_cast<ShutdownType>(request->shutdown_type());
+
+    // If requested a refresh index shutdown
+    if(shutdown_type == ShutdownType::REFRESH_INDEX)
+    {
+        // Check if the search engine requires it
+        if(!mSearchEngine->requireRefresh())
+        {
+            LOG(INFO) << "The selected search engine doesn't requires index refresh.";
+            reply->set_shutdown(false);
+            return grpc::Status::OK;
+        }
+    }
+
     mShutdownRequest.set_value(shutdown_type);
     reply->set_shutdown(true);
     return grpc::Status::OK;

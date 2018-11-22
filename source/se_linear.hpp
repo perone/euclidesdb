@@ -14,6 +14,7 @@ public:
             const DatabaseManager::DatabaseManagerPtr &database_manager);
 
     void setup() override;
+    bool requireRefresh() override;
 
     void search(const std::string &model_name,
                 const torch::Tensor &features_tensor,
