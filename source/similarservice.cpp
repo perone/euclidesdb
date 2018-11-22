@@ -54,6 +54,10 @@ grpc::Status SimilarServiceImpl::FindSimilar(grpc::ServerContext* context,
         const FindSimilarRequest* request, FindSimilarReply* reply)
 {
     TIMED_SCOPE(timerFindSimilar, "FindSimilar");
+    torch::NoGradGuard nograd;
+
+    if(request->top_k() <= 0)
+        return euclides_grpc_error("Top K must be greater than zero.");
 
     // TODO: refactor to return a bool instead of undefined tensor
     // upon failure.
@@ -61,7 +65,8 @@ grpc::Status SimilarServiceImpl::FindSimilar(grpc::ServerContext* context,
     if(image_tensor.type_id() == torch::UndefinedTensorId())
         return euclides_grpc_error("Undefined tensor, cannot parse image data.");
 
-    torch::Tensor var_image_tensor = torch::autograd::make_variable(image_tensor);
+    torch::autograd::Variable var_image_tensor = \
+        torch::autograd::make_variable(image_tensor, false);
     std::vector<torch::jit::IValue> net_inputs;
     net_inputs.push_back(var_image_tensor);
 
@@ -79,8 +84,11 @@ grpc::Status SimilarServiceImpl::FindSimilar(grpc::ServerContext* context,
         PERFORMANCE_CHECKPOINT_WITH_ID(timerFindSimilar, "AfterInference");
         auto elements = ival.toTuple()->elements();
 
-        const at::Tensor &preds = elements[0].toTensor();
-        const at::Tensor &features = elements[1].toTensor();
+        const torch::autograd::Variable &preds_var = elements[0].toTensor();
+        const torch::autograd::Variable &features_var = elements[1].toTensor();
+
+        const torch::Tensor &preds = preds_var.data();
+        const torch::Tensor &features = features_var.data();
 
         LOG(INFO) << "Prediction Size: " << preds.sizes();
         LOG(INFO) << "Feature Size: " << features.sizes();
@@ -90,6 +98,7 @@ grpc::Status SimilarServiceImpl::FindSimilar(grpc::ServerContext* context,
 
         std::vector<int> toplist;
         std::vector<float> distances;
+
         mSearchEngine->search(model_name, features, request->top_k(),
                               &toplist, &distances);
 
@@ -147,8 +156,8 @@ SimilarServiceImpl::AddImage(grpc::ServerContext *context,
         if(elements.size() != 2)
             LOG(ERROR) << "Model " << model_name << "is generating more than 2 outputs";
 
-        const at::Tensor &predictions = elements[0].toTensor();
-        const at::Tensor &features = elements[1].toTensor();
+        const torch::Tensor &predictions = elements[0].toTensor();
+        const torch::Tensor &features = elements[1].toTensor();
 
         LOG(INFO) << "Prediction Shape : " << predictions.sizes();
         LOG(INFO) << "Features Shape   : " << features.sizes();
