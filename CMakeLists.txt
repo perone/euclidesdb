@@ -109,6 +109,8 @@ add_executable(${PROJECT_NAME}
                ${PROTO_SRCS}
                ${GRPC_SRCS})
 
+target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic -Wno-unused-parameter)
+
 # ----[ Add the ./lib to the RPATH for Apple and Unix
 if(APPLE)
     set_target_properties(${PROJECT_NAME} PROPERTIES
