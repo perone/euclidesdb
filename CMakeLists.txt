@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.9)
 
 project(euclidesdb CXX)
 
@@ -29,6 +29,8 @@ find_package(GRPC REQUIRED)
 find_package(LevelDB REQUIRED)
 find_package(Torch REQUIRED)
 find_package(PythonInterp 3.6 REQUIRED)
+find_package(OpenMP REQUIRED)
+find_package(BLAS REQUIRED)
 
 # ---[ gRPC Protocols
 set(PROTOS
@@ -128,7 +130,9 @@ target_link_libraries(${PROJECT_NAME}
                       ${TORCH_LIBRARIES}
                       faiss
                       gRPC::grpc++_reflection
-                      protobuf::libprotobuf)
+                      protobuf::libprotobuf
+                      OpenMP::OpenMP_CXX
+                      ${BLAS_LIBRARIES})
 
 add_dependencies(${PROJECT_NAME} generate_proto)
 add_dependencies(${PROJECT_NAME} faiss_external)
