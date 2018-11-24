@@ -7,6 +7,8 @@ DatabaseManager::DatabaseManager(const std::string &db_path)
 {
     leveldb::Options options;
     options.create_if_missing = true;
+    options.compression = leveldb::CompressionType::kSnappyCompression;
+
     leveldb::Status status = leveldb::DB::Open(options, db_path, &mDb);
 
     if(!status.ok())
