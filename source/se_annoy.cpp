@@ -7,9 +7,9 @@ SEAnnoy::SEAnnoy(const TorchManager::TorchManagerPtr &torch_manager,
                  const DatabaseManager::DatabaseManagerPtr &database_manager)
         : SearchEngine(torch_manager, database_manager)
 {
-    vector<string> model_list = mTorchManager->getModuleList();
+    std::vector<std::string> model_list = mTorchManager->getModuleList();
 
-    for(const string &model_name : model_list)
+    for(const std::string &model_name : model_list)
     {
         TorchModelProp props = mTorchManager->getModuleProps(model_name);
         const int feat_dim = props.getFeatureDim();
@@ -46,7 +46,7 @@ void SEAnnoy::setup()
         for(auto &vector : *item_data.mutable_vectors())
         {
             const float *feature_data = vector.mutable_features()->data();
-            const string &model_name = vector.model();
+            const std::string &model_name = vector.model();
             mAnnoyMap[model_name]->add_item(index_id_counter[model_name], feature_data);
             total_items++;
 
@@ -74,7 +74,7 @@ SEAnnoy::search(const std::string &model_name,
                 std::vector<int> *top_ids,
                 std::vector<float> *distances)
 {
-    auto index = mAnnoyMap[model_name];
+    AnnoyPtr index = mAnnoyMap[model_name];
     const float *raw_features = features_tensor[0].data<float>();
     const int size = features_tensor.sizes()[1];
     index->get_nns_by_vector(raw_features, size, top_k, top_ids, distances);
@@ -89,3 +89,6 @@ bool SEAnnoy::requireRefresh()
 {
     return true;
 }
+
+SEAnnoy::~SEAnnoy()
+{ }
