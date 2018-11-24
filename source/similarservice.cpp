@@ -99,6 +99,9 @@ grpc::Status SimilarServiceImpl::FindSimilar(grpc::ServerContext* context,
         std::vector<int> toplist;
         std::vector<float> distances;
 
+        toplist.reserve(request->top_k());
+        distances.reserve(request->top_k());
+
         mSearchEngine->search(model_name, features, request->top_k(),
                               &toplist, &distances);
 
