@@ -19,7 +19,7 @@ public:
     bool addItemData(const euclidesproto::ItemData &item_data);
     bool removeItem(int item_id);
 
-    DatabaseIterator newIterator();
+    DatabaseIterator newIterator(bool fill_cache=true);
 
 private:
     leveldb::DB* mDb;

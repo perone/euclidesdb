@@ -44,9 +44,11 @@ bool DatabaseManager::addItemData(const euclidesproto::ItemData &item_data)
     return s.ok();
 }
 
-DatabaseManager::DatabaseIterator DatabaseManager::newIterator()
+DatabaseManager::DatabaseIterator DatabaseManager::newIterator(bool fill_cache)
 {
-    DatabaseManager::DatabaseIterator it(mDb->NewIterator(leveldb::ReadOptions()));
+    leveldb::ReadOptions roptions;
+    roptions.fill_cache = fill_cache;
+    DatabaseManager::DatabaseIterator it(mDb->NewIterator(roptions));
     return it;
 }
 
