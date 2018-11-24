@@ -34,5 +34,6 @@ To install EuclidesDB in MacOS, the best approach is to install dependencies usi
 
     brew install grpc
     brew install leveldb
+    brew install libomp
 
 After this, please go to the `Release Download <https://github.com/perone/euclidesdb/releases>`_ page in Github and download the latest stable MacOS build, extract the file and you're ready to go. See how to configure EuclidesDB on the :ref:`section-configuring` section.
