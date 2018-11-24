@@ -3,7 +3,7 @@ FROM ubuntu:16.04
 RUN apt-get update
 RUN apt-get upgrade -y
 RUN apt-get install -y git wget curl build-essential unzip ca-certificates libjpeg-dev libpng-dev \
-                       autoconf libtool pkg-config
+                       autoconf libtool pkg-config libopenblas-dev
 WORKDIR /opt
 
 # Get rid of old cmake

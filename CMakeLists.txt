@@ -15,6 +15,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_COLOR_MAKEFILE ON)
 
 Include(FindProtobuf)
+include(ExternalProject)
 
 # ----[ libtorch should be a symbolic link inside the building
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
@@ -36,6 +37,18 @@ set(PROTOS
 
 # ---[ This is needed due to protobuf compilation
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
+
+# ---[ Faiss integration
+ExternalProject_Add(faiss_external
+        SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/modules/faiss
+        CONFIGURE_COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/modules/faiss/configure --prefix=${CMAKE_BINARY_DIR}
+        BUILD_COMMAND ${MAKE}
+        BUILD_IN_SOURCE 1)
+
+set(FAISS_LIB_DIR ${CMAKE_CURRENT_BINARY_DIR}/lib)
+add_library(faiss STATIC IMPORTED)
+set_target_properties(faiss PROPERTIES IMPORTED_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/lib/libfaiss.a)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/modules)
 
 # ---[ Protobuf and gRPC generation
 protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ${PROTOS})
@@ -113,10 +126,12 @@ target_compile_options(${PROJECT_NAME} PRIVATE -DELPP_FEATURE_PERFORMANCE_TRACKI
 target_link_libraries(${PROJECT_NAME}
                       ${LevelDB_LIBRARIES}
                       ${TORCH_LIBRARIES}
+                      faiss
                       gRPC::grpc++_reflection
                       protobuf::libprotobuf)
 
 add_dependencies(${PROJECT_NAME} generate_proto)
+add_dependencies(${PROJECT_NAME} faiss_external)
 
 # ----[ Copy libraries to the build directory
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
