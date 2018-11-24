@@ -14,6 +14,7 @@ public:
 public:
     SEAnnoy(const TorchManager::TorchManagerPtr &torch_manager,
             const DatabaseManager::DatabaseManagerPtr &database_manager);
+    ~SEAnnoy();
 
     void setup() override;
     bool requireRefresh() override;
