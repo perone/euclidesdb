@@ -94,9 +94,10 @@ SELinear::search(const std::string &model_name,
             }
 
             const IdDistance id_dist(item_data.item_id(), distance);
-            if(pri_queue.size() < top_k || id_dist < pri_queue.top())
+            const int queue_size = static_cast<int>(pri_queue.size());
+            if(queue_size < top_k || id_dist < pri_queue.top())
             {
-                if (pri_queue.size() == top_k)
+                if (queue_size == top_k)
                     pri_queue.pop();
                 pri_queue.push(id_dist);
             }
@@ -117,3 +118,6 @@ bool SELinear::requireRefresh()
 {
     return false;
 }
+
+SELinear::~SELinear()
+{ }
