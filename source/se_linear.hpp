@@ -27,6 +27,7 @@ public:
     SELinear(const TorchManager::TorchManagerPtr &torch_manager,
              const DatabaseManager::DatabaseManagerPtr &database_manager,
              bool normalize=false, int pnorm=2);
+    ~SELinear();
 
     /**
      * This method has no effect for this search engine, given

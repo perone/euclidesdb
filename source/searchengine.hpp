@@ -14,6 +14,8 @@ public:
 
     SearchEngine(const TorchManager::TorchManagerPtr &torch_manager,
                  const DatabaseManager::DatabaseManagerPtr &database_manager);
+    virtual ~SearchEngine() = 0;
+
     virtual void setup() = 0;
     virtual bool requireRefresh() = 0;
 
