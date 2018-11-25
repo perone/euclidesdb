@@ -130,12 +130,8 @@ int main(int argc, char** argv)
     DatabaseManager::DatabaseManagerPtr database_manager = \
         std::make_shared<DatabaseManager>(db_path);
 
-    //SEAnnoy::SEAnnoyPtr searchengine = \
-    //    std::make_shared<SEAnnoy>(torch_manager, database_manager);
-
-    SEFaissFactory::SEFaissFactoryPtr searchengine = \
-        std::make_shared<SEFaissFactory>(torch_manager, database_manager,
-                "IVF2,Flat", FaissMetricType::METRIC_L2);
+    SEAnnoy::SEAnnoyPtr searchengine = \
+        std::make_shared<SEAnnoy>(torch_manager, database_manager);
 
     searchengine->setup();
 
