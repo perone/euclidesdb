@@ -3,6 +3,9 @@
 #include <unordered_map>
 #include <string>
 
+#include <INIReader.h>
+
+
 #include "torchmanager.hpp"
 #include "databasemanager.hpp"
 
@@ -24,10 +27,13 @@ public:
                         int top_k, std::vector<int> *top_ids,
                         std::vector<float> *distances) = 0;
 
+    static SearchEnginePtr build_search_engine(const INIReader &conf_reader,
+                                               const TorchManager::TorchManagerPtr &torch_manager,
+                                               const DatabaseManager::DatabaseManagerPtr &database_manager);
+
 protected:
     TorchManager::TorchManagerPtr mTorchManager;
     DatabaseManager::DatabaseManagerPtr mDatabaseManager;
 };
-
 
 

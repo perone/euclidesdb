@@ -17,9 +17,8 @@
 #include "similarservice.hpp"
 #include "torchmanager.hpp"
 #include "databasemanager.hpp"
+
 #include "searchengine.hpp"
-#include "se_annoy.hpp"
-#include "se_faissfactory.hpp"
 
 #include <easylogging++.h>
 
@@ -83,6 +82,8 @@ void RunServer(const string &server_address,
     }
 }
 
+
+
 int main(int argc, char** argv)
 {
     GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -94,14 +95,14 @@ int main(int argc, char** argv)
         ->check(CLI::ExistingFile);
     CLI11_PARSE(app, argc, argv);
 
-    INIReader reader(config_filename);
-    if (reader.ParseError() < 0)
+    INIReader conf_reader(config_filename);
+    if (conf_reader.ParseError() < 0)
         std::cerr << "Unable to parse the configuration file: "
                   << config_filename << std::endl;;
 
     std::cout << "Configuration " << config_filename << " loaded." << std::endl;
 
-    const std::string log_file_path = reader.Get("server", "log_file_path", "");
+    const std::string log_file_path = conf_reader.Get("server", "log_file_path", "");
     if(log_file_path.empty())
         std::cerr << "You need to specify a log_file_path for log file." << std::endl;
 
@@ -109,15 +110,15 @@ int main(int argc, char** argv)
     euclidesdb_init(log_file_path);
     LOG(INFO) << "EuclidesDB v." << EUCLIDESDB_VERSION_STRING << " initialized.";
 
-    const std::string model_path = reader.Get("models", "dir_path", "");
+    const std::string model_path = conf_reader.Get("models", "dir_path", "");
     if(model_path.empty())
         LOG(FATAL) << "You need to specify a dir_path for models.";
 
-    const std::string server_address = reader.Get("server", "address", "");
+    const std::string server_address = conf_reader.Get("server", "address", "");
     if(server_address.empty())
         LOG(FATAL) << "You need to specify a address for the server.";
 
-    const std::string db_path = reader.Get("database", "db_path", "");
+    const std::string db_path = conf_reader.Get("database", "db_path", "");
     if(db_path.empty())
         LOG(FATAL) << "You need to specify a database directory path.";
 
@@ -130,13 +131,11 @@ int main(int argc, char** argv)
     DatabaseManager::DatabaseManagerPtr database_manager = \
         std::make_shared<DatabaseManager>(db_path);
 
-    SEAnnoy::SEAnnoyPtr searchengine = \
-        std::make_shared<SEAnnoy>(torch_manager, database_manager);
-
-    searchengine->setup();
+    SearchEngine::SearchEnginePtr search_engine = \
+        SearchEngine::build_search_engine(conf_reader, torch_manager, database_manager);
 
     RunServer(server_address, torch_manager,
-              database_manager, searchengine);
+              database_manager, search_engine);
 
     google::protobuf::ShutdownProtobufLibrary();
     return 0;
