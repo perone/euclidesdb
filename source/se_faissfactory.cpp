@@ -20,11 +20,7 @@ SEFaissFactory::SEFaissFactory(const TorchManager::TorchManagerPtr &torch_manage
         const int feat_dim = props.getFeatureDim();
         FaissIndexPtr faiss_index(
                 faiss::index_factory(feat_dim, index_type.c_str(), faiss_mtype));
-        if(!faiss_index->is_trained)
-        {
-            LOG(FATAL) << "This index type: " << index_type
-                       << ", requires training.";
-        }
+
         mFaissMap[model_name] = faiss_index;
     }
 }
@@ -47,6 +43,8 @@ void SEFaissFactory::setup()
         mFaissMap[model_name]->reset();
     }
 
+    std::unordered_map<std::string,std::vector<float>> model_items;
+
     DatabaseManager::DatabaseIterator it(mDatabaseManager->newIterator());
     for (it->SeekToFirst(); it->Valid(); it->Next())
     {
@@ -58,7 +56,9 @@ void SEFaissFactory::setup()
             const float *feature_data = vector.mutable_features()->data();
             const std::string &model_name = vector.model();
 
-            mFaissMap[model_name]->add(1, feature_data);
+            const std::vector<float>::const_iterator end_vec = model_items[model_name].end();
+            model_items[model_name].insert(end_vec, feature_data,
+                                           feature_data + vector.features_size());
             total_items++;
 
             idmapping_t &id_mapping = mIdMapping[model_name];
@@ -66,6 +66,21 @@ void SEFaissFactory::setup()
 
             index_id_counter[model_name]++;
         }
+    }
+
+    for(auto pair_model_item : model_items)
+    {
+        const std::string &model_name = pair_model_item.first;
+        const std::vector<float> &item_data = pair_model_item.second;
+
+        if(!mFaissMap[model_name]->is_trained)
+        {
+            mFaissMap[model_name]->train(index_id_counter[model_name], item_data.data());
+            LOG(INFO) << "Trained index for " << model_name << " with "
+                      << item_data.size()/1024.0 << " kbytes.";
+        }
+
+        mFaissMap[model_name]->add(index_id_counter[model_name], item_data.data());
     }
 
     LOG(INFO) << "Added " << total_items << " items into Faiss index.";
@@ -86,24 +101,20 @@ void SEFaissFactory::search(const std::string &model_name,
     FaissIndexPtr index = mFaissMap[model_name];
     const float *raw_features = features_tensor[0].data<float>();
 
-    long *item_ids = new long[top_k];
-    float *item_distances = new float[top_k];
+    std::shared_ptr<long> item_ids(new long[top_k], std::default_delete<long[]>());
+    std::shared_ptr<float> item_distances(new float[top_k], std::default_delete<float[]>());
 
-    std::fill(item_ids, item_ids + top_k, -1);
-    std::fill(item_distances, item_distances + top_k, -1);
-
-    index->search(1, raw_features, top_k, item_distances, item_ids);
+    index->search(1, raw_features, top_k, item_distances.get(), item_ids.get());
 
     const int maximum_k = std::min(top_k, static_cast<int>(index->ntotal));
+    const long *item_ids_deref = item_ids.get();
+    const float *distances_deref = item_distances.get();
 
     for(int i=0; i<maximum_k; i++)
     {
-        top_ids->push_back(item_ids[i]);
-        distances->push_back(item_distances[i]);
+        top_ids->push_back(item_ids_deref[i]);
+        distances->push_back(distances_deref[i]);
     }
-
-    delete [] item_ids;
-    delete [] item_distances;
 
     idmapping_t &id_mapping = mIdMapping[model_name];
     for(auto &item : *top_ids)
