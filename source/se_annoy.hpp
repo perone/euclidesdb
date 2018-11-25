@@ -13,7 +13,8 @@ public:
 
 public:
     SEAnnoy(const TorchManager::TorchManagerPtr &torch_manager,
-            const DatabaseManager::DatabaseManagerPtr &database_manager);
+            const DatabaseManager::DatabaseManagerPtr &database_manager,
+            int tree_factor = 2);
     ~SEAnnoy();
 
     void setup() override;
@@ -28,6 +29,7 @@ private:
     typedef std::shared_ptr<AnnoyIndex<int, float, Angular, Kiss32Random>> AnnoyPtr;
     typedef std::unordered_map<int, int> idmapping_t;
 
+    int mTreeFactor;
     std::unordered_map<std::string, AnnoyPtr> mAnnoyMap;
     std::unordered_map<std::string, idmapping_t> mIdMapping;
 };

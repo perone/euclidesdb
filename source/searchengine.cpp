@@ -5,6 +5,7 @@
 #include "se_faissfactory.hpp"
 #include "se_linear.hpp"
 
+#include <easylogging++.h>
 
 SearchEngine::SearchEngine(const TorchManager::TorchManagerPtr &torch_manager,
                            const DatabaseManager::DatabaseManagerPtr &database_manager)
@@ -25,21 +26,26 @@ SearchEngine::SearchEnginePtr SearchEngine::build_search_engine(const INIReader 
     SearchEngine::SearchEnginePtr searchengine;
     if (se_engine == "annoy")
     {
-        searchengine = std::make_shared<SEAnnoy>(torch_manager, database_manager);
+        const int tree_factor = static_cast<int>(conf_reader.GetInteger("annoy", "tree_factor", 2));
+        searchengine = std::make_shared<SEAnnoy>(torch_manager, database_manager, tree_factor);
     } else if (se_engine == "faiss")
     {
-        const std::string faiss_index_type = \
-            conf_reader.Get("faiss", "index_type", "");
-        if (faiss_index_type.empty())
-            LOG(FATAL) << "You need to specify a index_type in the configuration.";
-
+        const std::string faiss_index_type = conf_reader.Get("faiss", "index_type", "Flat");
+        const std::string faiss_metric = conf_reader.Get("faiss", "metric", "l2");
+        FaissMetricType metric_type = (faiss_metric == "l2") ?
+                                       FaissMetricType::METRIC_L2 :
+                                       FaissMetricType::METRIC_INNER_PRODUCT;
         searchengine = \
             std::make_shared<SEFaissFactory>(torch_manager, database_manager,
-                                             faiss_index_type, FaissMetricType::METRIC_L2);
-    } else if (se_engine == "linear_exact")
+                                             faiss_index_type, metric_type);
+    } else if (se_engine == "exact_disk")
     {
+        const bool normalize = conf_reader.GetBoolean("exact_disk", "normalize", false);
+        const int pnorm = static_cast<int>(conf_reader.GetInteger("exact_disk", "pnorm", 2));
+
         searchengine = \
-            std::make_shared<SELinear>(torch_manager, database_manager);
+            std::make_shared<SELinear>(torch_manager, database_manager,
+                                       normalize, pnorm);
     }
     else
     {

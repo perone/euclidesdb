@@ -4,8 +4,9 @@
 
 
 SEAnnoy::SEAnnoy(const TorchManager::TorchManagerPtr &torch_manager,
-                 const DatabaseManager::DatabaseManagerPtr &database_manager)
-        : SearchEngine(torch_manager, database_manager)
+                 const DatabaseManager::DatabaseManagerPtr &database_manager,
+                 int tree_factor)
+: SearchEngine(torch_manager, database_manager), mTreeFactor(tree_factor)
 {
     std::vector<std::string> model_list = mTorchManager->getModuleList();
 
@@ -62,7 +63,7 @@ void SEAnnoy::setup()
     for(auto &pair : mAnnoyMap)
     {
         auto index = pair.second;
-        index->build(2 * index->get_f());
+        index->build(mTreeFactor * index->get_f());
     }
     return;
 }
