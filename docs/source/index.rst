@@ -11,7 +11,7 @@ EuclidesDB is a multi-model machine learning feature database that is tight coup
 * Uses protobuf for data serialization;
 * Uses gRPC for communication;
 * LevelDB integration for database serialization;
-* Uses LSH (`Annoy <https://github.com/spotify/annoy>`_) for approximate nearest neighbors search;
+* Many indexing methods implemented (`Annoy <https://github.com/spotify/annoy>`_, `Faiss <https://github.com/facebookresearch/faiss>`_, etc);
 * Tight PyTorch integration through libtorch;
 * Easy integration for new custom fine-tuned models;
 * Easy client language binding generation;

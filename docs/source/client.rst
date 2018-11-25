@@ -4,7 +4,7 @@ This section will show how to use the multiple client APIs that can communicate 
 
 Python Client API
 -------------------------------------------------------------------------------
-Before using the Python client API, you just have to install it using `pip`::
+Before using the Python client API, you just have to install it using ``pip``::
 
     pip install euclides
 
@@ -18,7 +18,7 @@ After that, if you want o add a new item into the database, just follow the exam
         db = euclides.EuclidesDB(channel)
         ret_add = db.add_image(image_id, models, image)
 
-All images are assumed to be PIL images, the same type handled by `torchvision`. You can see a complete example below, for more examples, see the `Python package examples <https://github.com/perone/euclidesdb/tree/master/python/examples>`_ folder.
+All images are assumed to be PIL images, the same type handled by ``torchvision``. You can see a complete example below, for more examples, see the `Python package examples <https://github.com/perone/euclidesdb/tree/master/python/examples>`_ folder.
 
 .. code-block:: python
 

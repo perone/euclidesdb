@@ -14,7 +14,7 @@ You can also contribute by coding, testing or adding documentation, but before d
 
 Setting a development environment
 -------------------------------------------------------------------------------
-To set a development environment, you can just clone the repository and use *cmake* to generate makefiles::
+To set a development environment, you can just clone the repository and use ``cmake`` to generate makefiles::
 
     git clone https://github.com/perone/euclidesdb.git
     mkdir build

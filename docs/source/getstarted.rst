@@ -10,7 +10,7 @@ To understand EuclidesDB you need to understand the concepts of its underlying a
     :align: center
     :scale: 30%
 
-Nowadays, many people are still serving machine learning/deep learning models for requests containing binary data using serialization formats and communication protocols such as `JSON+Base64` and `HTTP/1.1`, which isn't appropriate for many reasons (a burden for the wire protocol). Serving machine learning models also poses some unique challenges, and although there are many search engines available for feature search, they're not tight coupled with deep learning frameworks. What happens in practice, is that a lot of different companies end up creating their own systems for model serving, similarity search on the feature space, etc.
+Nowadays, many people are still serving machine learning/deep learning models for requests containing binary data using serialization formats and communication protocols such as ``JSON+Base64`` and ``HTTP/1.1``, which isn't appropriate for many reasons (a burden for the wire protocol). Serving machine learning models also poses some unique challenges, and although there are many search engines available for feature search, they're not tight coupled with deep learning frameworks. What happens in practice, is that a lot of different companies end up creating their own systems for model serving, similarity search on the feature space, etc.
 
 A simple use case that might make the EuclidesDB role clear is the case where you want to do similarity search for, let's say, fashion industry and you have for instance multiple models trained for each item category (such as shoes, t-shirts, etc), and you want to use different model spaces to index and query different items.
 
@@ -20,10 +20,11 @@ EuclidesDB tries to solve some issues in this context by providing a very simple
 
 Concepts
 -------------------------------------------------------------------------------
-There are two main concepts in EuclidesDB:
+There are some important concepts in EuclidesDB:
 
 - **Module/Model**: we use the concept Module/Model interchangeably because we use PyTorch modules to represent every computation;
 - **Model Space**: a model space is the space of features that a model generated and that will be consistent within the same model, given that multiple models are supported, you can add a new image in the database only for some particular models or query only some particular model space;
+- **Search Engine**: this is how EuclidesDB index and search for items in the database. EuclidesDB supports a wide range of different indexes that are described in the :ref:`search-config` section;
 
 When you add a new image or other kind of data (*we're expanding the support for other kind of items*) into the database, you also specify which model should be used to index this data. Then this data is forwarded into these specified models and their features are saved into a local key-value database to be used later on the construction of a querying index. 
 
