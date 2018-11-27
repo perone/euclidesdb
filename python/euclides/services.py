@@ -17,6 +17,9 @@ class Channel(object):
             target=self.hostport,
             options=self.options)
 
+    def close(self):
+        self._channel.close()
+
     def __enter__(self):
         return self
 
