@@ -6,6 +6,10 @@ option java_outer_classname = "EuclidesProto";
 
 package euclidesproto;
 
+message EuclidesDBMetadata {
+    int32 database_version = 1;
+}
+
 message FindSimilarRequest {
     int32 top_k = 1;
     bytes image_data = 2;
