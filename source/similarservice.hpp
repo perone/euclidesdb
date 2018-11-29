@@ -29,8 +29,9 @@ public:
                        std::promise<ShutdownType> shutdown_request);
 
 public:
-    grpc::Status FindSimilar(grpc::ServerContext *context, const FindSimilarRequest *request,
-                             FindSimilarReply *reply) override;
+    grpc::Status FindSimilarImage(grpc::ServerContext *context,
+                                  const FindSimilarImageRequest *request,
+                                  FindSimilarImageReply *reply) override;
 
     grpc::Status AddImage(grpc::ServerContext *context, const AddImageRequest *request,
                           AddImageReply *reply) override;

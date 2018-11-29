@@ -10,7 +10,7 @@ message EuclidesDBMetadata {
     int32 database_version = 1;
 }
 
-message FindSimilarRequest {
+message FindSimilarImageRequest {
     int32 top_k = 1;
     bytes image_data = 2;
     repeated string models = 3;
@@ -22,7 +22,7 @@ message SearchResults {
     string model = 3;
 }
 
-message FindSimilarReply {
+message FindSimilarImageReply {
     repeated SearchResults results = 1;
 }
 
@@ -67,7 +67,7 @@ message ShutdownReply {
 
 service Similar {
     rpc Shutdown (ShutdownRequest) returns (ShutdownReply) {}
-    rpc FindSimilar (FindSimilarRequest) returns (FindSimilarReply) {}
+    rpc FindSimilarImage (FindSimilarImageRequest) returns (FindSimilarImageReply) {}
     rpc AddImage (AddImageRequest) returns (AddImageReply) {}
     rpc RemoveImage (RemoveImageRequest) returns (RemoveImageReply) {}
 }

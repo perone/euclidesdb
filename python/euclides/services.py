@@ -52,14 +52,14 @@ class EuclidesDB(object):
         reply = self.stub.RemoveImage(request)
         return reply
 
-    def find_similar(self, image, models, top_k=5):
+    def find_similar_image(self, image, models, top_k=5):
         bytes_img = io.BytesIO()
         image.save(bytes_img, format=self.wire_image)
-        request = ec_proto.FindSimilarRequest()
+        request = ec_proto.FindSimilarImageRequest()
         request.models.extend(models)
         request.top_k = int(top_k)
         request.image_data = bytes_img.getvalue()
-        reply = self.stub.FindSimilar(request)
+        reply = self.stub.FindSimilarImage(request)
         return reply
 
     def __shutdown(self, shutdown_type):

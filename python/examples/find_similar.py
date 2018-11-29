@@ -29,7 +29,7 @@ def run_main():
 
     with euclides.Channel("localhost", 50000) as channel:
         db = euclides.EuclidesDB(channel)
-        ret_similar = db.find_similar(image, ["resnet18"], args.topk)
+        ret_similar = db.find_similar_image(image, ["resnet18"], args.topk)
 
     print(ret_similar)
 

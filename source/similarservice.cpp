@@ -50,8 +50,8 @@ SimilarServiceImpl::SimilarServiceImpl(const TorchManager::TorchManagerPtr &torc
   mShutdownRequest(std::move(shutdown_request))
 { }
 
-grpc::Status SimilarServiceImpl::FindSimilar(grpc::ServerContext* context,
-        const FindSimilarRequest* request, FindSimilarReply* reply)
+grpc::Status SimilarServiceImpl::FindSimilarImage(grpc::ServerContext* context,
+        const FindSimilarImageRequest* request, FindSimilarImageReply* reply)
 {
     TIMED_SCOPE(timerFindSimilar, "FindSimilar");
     torch::NoGradGuard nograd;

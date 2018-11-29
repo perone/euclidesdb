@@ -19,35 +19,66 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='euclidesproto',
   syntax='proto3',
   serialized_options=_b('\n\020euclidesdb.protoB\rEuclidesProtoP\001'),
-  serialized_pb=_b('\n\x13\x65uclidesproto.proto\x12\reuclidesproto\"G\n\x12\x46indSimilarRequest\x12\r\n\x05top_k\x18\x01 \x01(\x05\x12\x12\n\nimage_data\x18\x02 \x01(\x0c\x12\x0e\n\x06models\x18\x03 \x03(\t\"D\n\rSearchResults\x12\x11\n\ttop_k_ids\x18\x01 \x03(\x05\x12\x11\n\tdistances\x18\x02 \x03(\x02\x12\r\n\x05model\x18\x03 \x01(\t\"A\n\x10\x46indSimilarReply\x12-\n\x07results\x18\x01 \x03(\x0b\x32\x1c.euclidesproto.SearchResults\"_\n\x0f\x41\x64\x64ImageRequest\x12\x10\n\x08image_id\x18\x01 \x01(\x05\x12\x12\n\nimage_data\x18\x02 \x01(\x0c\x12\x16\n\x0eimage_metadata\x18\x03 \x01(\x0c\x12\x0e\n\x06models\x18\x04 \x03(\t\"&\n\x12RemoveImageRequest\x12\x10\n\x08image_id\x18\x01 \x01(\x05\"$\n\x10RemoveImageReply\x12\x10\n\x08image_id\x18\x01 \x01(\x05\"C\n\x0bItemVectors\x12\r\n\x05model\x18\x01 \x01(\t\x12\x13\n\x0bpredictions\x18\x02 \x03(\x02\x12\x10\n\x08\x66\x65\x61tures\x18\x03 \x03(\x02\"Z\n\x08ItemData\x12\x0f\n\x07item_id\x18\x01 \x01(\x05\x12\x10\n\x08metadata\x18\x02 \x01(\x0c\x12+\n\x07vectors\x18\x03 \x03(\x0b\x32\x1a.euclidesproto.ItemVectors\"<\n\rAddImageReply\x12+\n\x07vectors\x18\x01 \x03(\x0b\x32\x1a.euclidesproto.ItemVectors\"(\n\x0fShutdownRequest\x12\x15\n\rshutdown_type\x18\x01 \x01(\x05\"!\n\rShutdownReply\x12\x10\n\x08shutdown\x18\x01 \x01(\x08\x32\xcb\x02\n\x07Similar\x12J\n\x08Shutdown\x12\x1e.euclidesproto.ShutdownRequest\x1a\x1c.euclidesproto.ShutdownReply\"\x00\x12S\n\x0b\x46indSimilar\x12!.euclidesproto.FindSimilarRequest\x1a\x1f.euclidesproto.FindSimilarReply\"\x00\x12J\n\x08\x41\x64\x64Image\x12\x1e.euclidesproto.AddImageRequest\x1a\x1c.euclidesproto.AddImageReply\"\x00\x12S\n\x0bRemoveImage\x12!.euclidesproto.RemoveImageRequest\x1a\x1f.euclidesproto.RemoveImageReply\"\x00\x42#\n\x10\x65uclidesdb.protoB\rEuclidesProtoP\x01\x62\x06proto3')
+  serialized_pb=_b('\n\x13\x65uclidesproto.proto\x12\reuclidesproto\".\n\x12\x45uclidesDBMetadata\x12\x18\n\x10\x64\x61tabase_version\x18\x01 \x01(\x05\"L\n\x17\x46indSimilarImageRequest\x12\r\n\x05top_k\x18\x01 \x01(\x05\x12\x12\n\nimage_data\x18\x02 \x01(\x0c\x12\x0e\n\x06models\x18\x03 \x03(\t\"D\n\rSearchResults\x12\x11\n\ttop_k_ids\x18\x01 \x03(\x05\x12\x11\n\tdistances\x18\x02 \x03(\x02\x12\r\n\x05model\x18\x03 \x01(\t\"F\n\x15\x46indSimilarImageReply\x12-\n\x07results\x18\x01 \x03(\x0b\x32\x1c.euclidesproto.SearchResults\"_\n\x0f\x41\x64\x64ImageRequest\x12\x10\n\x08image_id\x18\x01 \x01(\x05\x12\x12\n\nimage_data\x18\x02 \x01(\x0c\x12\x16\n\x0eimage_metadata\x18\x03 \x01(\x0c\x12\x0e\n\x06models\x18\x04 \x03(\t\"&\n\x12RemoveImageRequest\x12\x10\n\x08image_id\x18\x01 \x01(\x05\"$\n\x10RemoveImageReply\x12\x10\n\x08image_id\x18\x01 \x01(\x05\"C\n\x0bItemVectors\x12\r\n\x05model\x18\x01 \x01(\t\x12\x13\n\x0bpredictions\x18\x02 \x03(\x02\x12\x10\n\x08\x66\x65\x61tures\x18\x03 \x03(\x02\"Z\n\x08ItemData\x12\x0f\n\x07item_id\x18\x01 \x01(\x05\x12\x10\n\x08metadata\x18\x02 \x01(\x0c\x12+\n\x07vectors\x18\x03 \x03(\x0b\x32\x1a.euclidesproto.ItemVectors\"<\n\rAddImageReply\x12+\n\x07vectors\x18\x01 \x03(\x0b\x32\x1a.euclidesproto.ItemVectors\"(\n\x0fShutdownRequest\x12\x15\n\rshutdown_type\x18\x01 \x01(\x05\"!\n\rShutdownReply\x12\x10\n\x08shutdown\x18\x01 \x01(\x08\x32\xda\x02\n\x07Similar\x12J\n\x08Shutdown\x12\x1e.euclidesproto.ShutdownRequest\x1a\x1c.euclidesproto.ShutdownReply\"\x00\x12\x62\n\x10\x46indSimilarImage\x12&.euclidesproto.FindSimilarImageRequest\x1a$.euclidesproto.FindSimilarImageReply\"\x00\x12J\n\x08\x41\x64\x64Image\x12\x1e.euclidesproto.AddImageRequest\x1a\x1c.euclidesproto.AddImageReply\"\x00\x12S\n\x0bRemoveImage\x12!.euclidesproto.RemoveImageRequest\x1a\x1f.euclidesproto.RemoveImageReply\"\x00\x42#\n\x10\x65uclidesdb.protoB\rEuclidesProtoP\x01\x62\x06proto3')
 )
 
 
 
 
-_FINDSIMILARREQUEST = _descriptor.Descriptor(
-  name='FindSimilarRequest',
-  full_name='euclidesproto.FindSimilarRequest',
+_EUCLIDESDBMETADATA = _descriptor.Descriptor(
+  name='EuclidesDBMetadata',
+  full_name='euclidesproto.EuclidesDBMetadata',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='top_k', full_name='euclidesproto.FindSimilarRequest.top_k', index=0,
+      name='database_version', full_name='euclidesproto.EuclidesDBMetadata.database_version', index=0,
+      number=1, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=38,
+  serialized_end=84,
+)
+
+
+_FINDSIMILARIMAGEREQUEST = _descriptor.Descriptor(
+  name='FindSimilarImageRequest',
+  full_name='euclidesproto.FindSimilarImageRequest',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='top_k', full_name='euclidesproto.FindSimilarImageRequest.top_k', index=0,
       number=1, type=5, cpp_type=1, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='image_data', full_name='euclidesproto.FindSimilarRequest.image_data', index=1,
+      name='image_data', full_name='euclidesproto.FindSimilarImageRequest.image_data', index=1,
       number=2, type=12, cpp_type=9, label=1,
       has_default_value=False, default_value=_b(""),
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
     _descriptor.FieldDescriptor(
-      name='models', full_name='euclidesproto.FindSimilarRequest.models', index=2,
+      name='models', full_name='euclidesproto.FindSimilarImageRequest.models', index=2,
       number=3, type=9, cpp_type=9, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -65,8 +96,8 @@ _FINDSIMILARREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=38,
-  serialized_end=109,
+  serialized_start=86,
+  serialized_end=162,
 )
 
 
@@ -110,20 +141,20 @@ _SEARCHRESULTS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=111,
-  serialized_end=179,
+  serialized_start=164,
+  serialized_end=232,
 )
 
 
-_FINDSIMILARREPLY = _descriptor.Descriptor(
-  name='FindSimilarReply',
-  full_name='euclidesproto.FindSimilarReply',
+_FINDSIMILARIMAGEREPLY = _descriptor.Descriptor(
+  name='FindSimilarImageReply',
+  full_name='euclidesproto.FindSimilarImageReply',
   filename=None,
   file=DESCRIPTOR,
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='results', full_name='euclidesproto.FindSimilarReply.results', index=0,
+      name='results', full_name='euclidesproto.FindSimilarImageReply.results', index=0,
       number=1, type=11, cpp_type=10, label=3,
       has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
@@ -141,8 +172,8 @@ _FINDSIMILARREPLY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=181,
-  serialized_end=246,
+  serialized_start=234,
+  serialized_end=304,
 )
 
 
@@ -193,8 +224,8 @@ _ADDIMAGEREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=248,
-  serialized_end=343,
+  serialized_start=306,
+  serialized_end=401,
 )
 
 
@@ -224,8 +255,8 @@ _REMOVEIMAGEREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=345,
-  serialized_end=383,
+  serialized_start=403,
+  serialized_end=441,
 )
 
 
@@ -255,8 +286,8 @@ _REMOVEIMAGEREPLY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=385,
-  serialized_end=421,
+  serialized_start=443,
+  serialized_end=479,
 )
 
 
@@ -300,8 +331,8 @@ _ITEMVECTORS = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=423,
-  serialized_end=490,
+  serialized_start=481,
+  serialized_end=548,
 )
 
 
@@ -345,8 +376,8 @@ _ITEMDATA = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=492,
-  serialized_end=582,
+  serialized_start=550,
+  serialized_end=640,
 )
 
 
@@ -376,8 +407,8 @@ _ADDIMAGEREPLY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=584,
-  serialized_end=644,
+  serialized_start=642,
+  serialized_end=702,
 )
 
 
@@ -407,8 +438,8 @@ _SHUTDOWNREQUEST = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=646,
-  serialized_end=686,
+  serialized_start=704,
+  serialized_end=744,
 )
 
 
@@ -438,16 +469,17 @@ _SHUTDOWNREPLY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=688,
-  serialized_end=721,
+  serialized_start=746,
+  serialized_end=779,
 )
 
-_FINDSIMILARREPLY.fields_by_name['results'].message_type = _SEARCHRESULTS
+_FINDSIMILARIMAGEREPLY.fields_by_name['results'].message_type = _SEARCHRESULTS
 _ITEMDATA.fields_by_name['vectors'].message_type = _ITEMVECTORS
 _ADDIMAGEREPLY.fields_by_name['vectors'].message_type = _ITEMVECTORS
-DESCRIPTOR.message_types_by_name['FindSimilarRequest'] = _FINDSIMILARREQUEST
+DESCRIPTOR.message_types_by_name['EuclidesDBMetadata'] = _EUCLIDESDBMETADATA
+DESCRIPTOR.message_types_by_name['FindSimilarImageRequest'] = _FINDSIMILARIMAGEREQUEST
 DESCRIPTOR.message_types_by_name['SearchResults'] = _SEARCHRESULTS
-DESCRIPTOR.message_types_by_name['FindSimilarReply'] = _FINDSIMILARREPLY
+DESCRIPTOR.message_types_by_name['FindSimilarImageReply'] = _FINDSIMILARIMAGEREPLY
 DESCRIPTOR.message_types_by_name['AddImageRequest'] = _ADDIMAGEREQUEST
 DESCRIPTOR.message_types_by_name['RemoveImageRequest'] = _REMOVEIMAGEREQUEST
 DESCRIPTOR.message_types_by_name['RemoveImageReply'] = _REMOVEIMAGEREPLY
@@ -458,12 +490,19 @@ DESCRIPTOR.message_types_by_name['ShutdownRequest'] = _SHUTDOWNREQUEST
 DESCRIPTOR.message_types_by_name['ShutdownReply'] = _SHUTDOWNREPLY
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
-FindSimilarRequest = _reflection.GeneratedProtocolMessageType('FindSimilarRequest', (_message.Message,), dict(
-  DESCRIPTOR = _FINDSIMILARREQUEST,
+EuclidesDBMetadata = _reflection.GeneratedProtocolMessageType('EuclidesDBMetadata', (_message.Message,), dict(
+  DESCRIPTOR = _EUCLIDESDBMETADATA,
   __module__ = 'euclidesproto_pb2'
-  # @@protoc_insertion_point(class_scope:euclidesproto.FindSimilarRequest)
+  # @@protoc_insertion_point(class_scope:euclidesproto.EuclidesDBMetadata)
   ))
-_sym_db.RegisterMessage(FindSimilarRequest)
+_sym_db.RegisterMessage(EuclidesDBMetadata)
+
+FindSimilarImageRequest = _reflection.GeneratedProtocolMessageType('FindSimilarImageRequest', (_message.Message,), dict(
+  DESCRIPTOR = _FINDSIMILARIMAGEREQUEST,
+  __module__ = 'euclidesproto_pb2'
+  # @@protoc_insertion_point(class_scope:euclidesproto.FindSimilarImageRequest)
+  ))
+_sym_db.RegisterMessage(FindSimilarImageRequest)
 
 SearchResults = _reflection.GeneratedProtocolMessageType('SearchResults', (_message.Message,), dict(
   DESCRIPTOR = _SEARCHRESULTS,
@@ -472,12 +511,12 @@ SearchResults = _reflection.GeneratedProtocolMessageType('SearchResults', (_mess
   ))
 _sym_db.RegisterMessage(SearchResults)
 
-FindSimilarReply = _reflection.GeneratedProtocolMessageType('FindSimilarReply', (_message.Message,), dict(
-  DESCRIPTOR = _FINDSIMILARREPLY,
+FindSimilarImageReply = _reflection.GeneratedProtocolMessageType('FindSimilarImageReply', (_message.Message,), dict(
+  DESCRIPTOR = _FINDSIMILARIMAGEREPLY,
   __module__ = 'euclidesproto_pb2'
-  # @@protoc_insertion_point(class_scope:euclidesproto.FindSimilarReply)
+  # @@protoc_insertion_point(class_scope:euclidesproto.FindSimilarImageReply)
   ))
-_sym_db.RegisterMessage(FindSimilarReply)
+_sym_db.RegisterMessage(FindSimilarImageReply)
 
 AddImageRequest = _reflection.GeneratedProtocolMessageType('AddImageRequest', (_message.Message,), dict(
   DESCRIPTOR = _ADDIMAGEREQUEST,
@@ -544,8 +583,8 @@ _SIMILAR = _descriptor.ServiceDescriptor(
   file=DESCRIPTOR,
   index=0,
   serialized_options=None,
-  serialized_start=724,
-  serialized_end=1055,
+  serialized_start=782,
+  serialized_end=1128,
   methods=[
   _descriptor.MethodDescriptor(
     name='Shutdown',
@@ -557,12 +596,12 @@ _SIMILAR = _descriptor.ServiceDescriptor(
     serialized_options=None,
   ),
   _descriptor.MethodDescriptor(
-    name='FindSimilar',
-    full_name='euclidesproto.Similar.FindSimilar',
+    name='FindSimilarImage',
+    full_name='euclidesproto.Similar.FindSimilarImage',
     index=1,
     containing_service=None,
-    input_type=_FINDSIMILARREQUEST,
-    output_type=_FINDSIMILARREPLY,
+    input_type=_FINDSIMILARIMAGEREQUEST,
+    output_type=_FINDSIMILARIMAGEREPLY,
     serialized_options=None,
   ),
   _descriptor.MethodDescriptor(
