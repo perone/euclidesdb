@@ -48,7 +48,7 @@ The ``search_engine`` can assume one the following parameters:
 
 Each one of these search engines has their pros and cons. For example, ``faiss`` can provide you a wide spectrum of index methods that offers various trade-offs with respect to search time, search quality, memory, training time, etc. In summary, each search engine will have their own configuration parameters.
 
-Annoy Configuration
+``annoy`` Configuration
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 The Annoy search engine configuration accepts only one parameter, called `tree_factor`. This parameter can be specified in the EuclidesDB configuration as seen below (with other configs omited for brevity):
 
@@ -69,7 +69,7 @@ Description of Annoy parameters:
 
 .. note:: For more information regarding how Annoy works, please see `Annoy documentation <https://github.com/spotify/annoy#how-does-it-work>`_ or the `excellent presentation <https://www.slideshare.net/erikbern/approximate-nearest-neighbor-methods-and-vector-models-nyc-ml-meetup>`_ from Erik Bernhardsson.
 
-Exact-disk Configuration
+``exact_disk`` Configuration
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 The search engine ``exact_disk`` is a very simple, but exact search engine. It will iterate over all items in the database (on the disk, hence the name ``exact_disk``) and it will calculate the distance among the query and all items.
 
@@ -92,7 +92,7 @@ A descripton of each parameter is shown below:
 * ``pnorm``: this is the `p-norm <https://en.wikipedia.org/wiki/Lp_space>`_ used to calculate the distance, the default value is 2 (euclidean distance);
 * ``normalize``: when ``true``, it will normalize feature vectors before doing the comparison. If you use a ``pnorm = 2`` and ``normalize = true``, you'll recover cosine similarity.
 
-Faiss Configuration
+``faiss`` Configuration
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 The ``faiss`` search engine is perhaps the one that offers the largest amount of indexing types. A configuration example is shown below (with other configs omited for brevity):
 

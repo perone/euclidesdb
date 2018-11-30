@@ -28,6 +28,7 @@ EuclidesDB is a multi-model machine learning feature database that is tight coup
    installation
    configuration
    client
+   grpcapi
    contributing
    license
 
