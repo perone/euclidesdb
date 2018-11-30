@@ -16,6 +16,12 @@ message FindSimilarImageRequest {
     repeated string models = 3;
 }
 
+message FindSimilarImageByIdRequest {
+    int32 top_k = 1;
+    int32 image_id = 2;
+    repeated string models = 3;
+}
+
 message SearchResults {
     repeated int32 top_k_ids = 1;
     repeated float distances = 2;
@@ -68,6 +74,7 @@ message ShutdownReply {
 service Similar {
     rpc Shutdown (ShutdownRequest) returns (ShutdownReply) {}
     rpc FindSimilarImage (FindSimilarImageRequest) returns (FindSimilarImageReply) {}
+    rpc FindSimilarImageById (FindSimilarImageByIdRequest) returns (FindSimilarImageReply) {}
     rpc AddImage (AddImageRequest) returns (AddImageReply) {}
     rpc RemoveImage (RemoveImageRequest) returns (RemoveImageReply) {}
 }

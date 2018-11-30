@@ -32,7 +32,9 @@ public:
     grpc::Status FindSimilarImage(grpc::ServerContext *context,
                                   const FindSimilarImageRequest *request,
                                   FindSimilarImageReply *reply) override;
-
+    grpc::Status FindSimilarImageById(grpc::ServerContext *context,
+                                  const FindSimilarImageByIdRequest *request,
+                                  FindSimilarImageReply *reply) override;
     grpc::Status AddImage(grpc::ServerContext *context, const AddImageRequest *request,
                           AddImageReply *reply) override;
     grpc::Status RemoveImage(grpc::ServerContext *context, const RemoveImageRequest *request,

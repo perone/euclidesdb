@@ -121,6 +121,75 @@ grpc::Status SimilarServiceImpl::FindSimilarImage(grpc::ServerContext* context,
     return grpc::Status::OK;
 }
 
+grpc::Status SimilarServiceImpl::FindSimilarImageById(grpc::ServerContext* context,
+                                                      const FindSimilarImageByIdRequest* request,
+                                                      FindSimilarImageReply* reply)
+{
+    TIMED_SCOPE(timerFindSimilar, "FindSimilar");
+    torch::NoGradGuard nograd;
+
+    if(request->top_k() <= 0)
+        return euclides_grpc_error("Top K must be greater than zero.");
+
+    // 1. Get the item data from the database
+    euclidesproto::ItemData item_data;
+    bool ret = mDatabaseManager->getItemDataByKey(request->image_id(), item_data);
+    if(!ret)
+        return euclides_grpc_error("Cannot find this item id in the database.");
+
+    for(const std::string &model_name : request->models())
+    {
+        LOG(INFO) << "Search in model space " << model_name;
+
+        TorchManager::torchmodule_t torch_module;
+        ret = mTorchManager->getModule(model_name, torch_module);
+        if (!ret)
+            return euclides_grpc_error("Cannot find the module: " + model_name);
+
+        int model_found = 0;
+
+        for(euclidesproto::ItemVectors &iv: *item_data.mutable_vectors())
+        {
+            // If this isn't in the same model space, skip
+            if(iv.model() != model_name)
+                continue;
+
+            model_found++;
+
+            void *features = static_cast<void*>(iv.mutable_features()->mutable_data());
+            torch::Tensor features_tensor = \
+                torch::CPU(torch::kFloat).tensorFromBlob(features, {1, iv.features_size()});
+
+            std::vector<int> toplist;
+            std::vector<float> distances;
+
+            toplist.reserve(request->top_k());
+            distances.reserve(request->top_k());
+
+            mSearchEngine->search(model_name, features_tensor, request->top_k(),
+                                  &toplist, &distances);
+
+            LOG(INFO) << "Search on " << model_name
+                      << " returned " << toplist.size() << " results.";
+
+            SearchResults *search_results = reply->add_results();
+            search_results->set_model(model_name);
+
+            google::protobuf::RepeatedField<int> rf_topk(toplist.begin(), toplist.end());
+            search_results->mutable_top_k_ids()->Swap(&rf_topk);
+
+            google::protobuf::RepeatedField<float> rf_distances(distances.begin(), distances.end());
+            search_results->mutable_distances()->Swap(&rf_distances);
+        }
+
+        if(model_found <= 0)
+            return euclides_grpc_error("Item not found in the model space: " + model_name);
+    }
+
+    return grpc::Status::OK;
+}
+
+
 grpc::Status
 SimilarServiceImpl::AddImage(grpc::ServerContext *context,
         const AddImageRequest *request, AddImageReply *reply)
@@ -238,3 +307,4 @@ SimilarServiceImpl::Shutdown(grpc::ServerContext *context, const ShutdownRequest
     reply->set_shutdown(true);
     return grpc::Status::OK;
 }
+

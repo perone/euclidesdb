@@ -35,6 +35,7 @@ SELinear::SELinear(const TorchManager::TorchManagerPtr &torch_manager,
 void SELinear::setup()
 {
     // No-op for exact search on disk
+    LOG(INFO) << "Using exact_disk linear search.";
 }
 
 void

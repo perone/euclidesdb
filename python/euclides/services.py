@@ -62,6 +62,14 @@ class EuclidesDB(object):
         reply = self.stub.FindSimilarImage(request)
         return reply
 
+    def find_similar_image_by_id(self, image_id, models, top_k=5):
+        request = ec_proto.FindSimilarImageByIdRequest()
+        request.models.extend(models)
+        request.top_k = int(top_k)
+        request.image_id = image_id
+        reply = self.stub.FindSimilarImageById(request)
+        return reply
+
     def __shutdown(self, shutdown_type):
         request = ec_proto.ShutdownRequest()
         request.shutdown_type = shutdown_type
