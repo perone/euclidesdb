@@ -1,3 +1,5 @@
+.. _grpc-api:
+
 Low-level gRPC API
 ===============================================================================
 This section describes the low-level gRPC API that you can use from any other language or any other server/service proxy.

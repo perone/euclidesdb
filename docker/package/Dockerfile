@@ -25,18 +25,6 @@ RUN cd leveldb && mkdir -p build && cd build && cmake -DCMAKE_BUILD_TYPE=Release
 RUN cd leveldb && cd build && make -j $(nproc)
 RUN cd leveldb && cd build && make install
 
-#RUN apt-get install -y protobuf-compiler libprotobuf-dev
-#RUN apt-get install -y libgrpc++-dev libgrpc++1 libgrpc-dev libgrpc3 
-#RUN apt-get install -y protobuf-compiler-grpc
-#RUN apt-get install -y libleveldb-dev libleveldb1v5 python3-leveldb vim
-
-#RUN apt-get install -y gcc-8 g++-8
-
-#RUN update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 800
-#RUN update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 800
-#RUN update-alternatives --set gcc /usr/bin/gcc-8
-#RUN update-alternatives --set g++ /usr/bin/g++-8
-
 # PyTorch
 ARG PYTHON_VERSION=3.6
 RUN curl -o ~/miniconda.sh -O  https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh  && \
