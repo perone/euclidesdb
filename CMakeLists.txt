@@ -119,8 +119,8 @@ if(APPLE)
         INSTALL_RPATH "@loader_path/lib")
 elseif(UNIX)
     set_target_properties(${PROJECT_NAME} PROPERTIES
-            BUILD_WITH_INSTALL_RPATH 1
-            INSTALL_RPATH "$ORIGIN/lib")
+        BUILD_WITH_INSTALL_RPATH 1
+        INSTALL_RPATH "lib")
 endif()
 
 # ----[ Directives fro easyloggingcpp
@@ -140,7 +140,7 @@ add_dependencies(${PROJECT_NAME} generate_proto)
 add_dependencies(${PROJECT_NAME} faiss_external)
 
 # ----[ Copy libraries to the build directory
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+add_custom_command(TARGET ${PROJECT_NAME} PRE_LINK
         COMMAND ${CMAKE_COMMAND} -E copy_directory
         ${CMAKE_SOURCE_DIR}/libtorch/lib $<TARGET_FILE_DIR:${PROJECT_NAME}>/lib)
 
