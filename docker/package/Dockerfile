@@ -39,12 +39,12 @@ WORKDIR /opt/pytorch
 RUN git clone https://github.com/pytorch/pytorch.git
 WORKDIR /opt/pytorch/pytorch
 
-RUN git submodule update --init
+RUN git checkout v1.0.1 && git submodule update --init && mkdir build
 
-RUN mkdir build
 RUN cd build && python ../tools/build_libtorch.py
 
-COPY euclidesdb /euclidesdb
+RUN cd / && git clone https://github.com/perone/euclidesdb.git && \
+    cd /euclidesdb && git submodule update --init
 
 RUN ln -s /opt/pytorch/pytorch/torch/lib/tmp_install /euclidesdb/libtorch
 RUN mv /euclidesdb/libtorch/include/google /euclidesdb/libtorch/include/g
