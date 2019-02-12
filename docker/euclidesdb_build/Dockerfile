@@ -7,7 +7,7 @@ WORKDIR /opt
 
 # Fetch will automatically use the GITHUB_OAUTH_TOKEN env variable
 RUN apt-get update && apt-get install -y \
-    wget curl \
+    wget curl libopenblas-dev \
     ca-certificates tar bzip2 && apt-get autoremove -y && apt-get clean -y && \
     rm -rf /var/lib/apt/lists/* && \
     \
@@ -28,11 +28,12 @@ RUN curl -o ~/miniconda.sh -O  https://repo.continuum.io/miniconda/Miniconda3-la
      ~/miniconda.sh -b -p /opt/conda && \
      rm ~/miniconda.sh && \
      /opt/conda/bin/conda install -y python=$PYTHON_VERSION numpy pyyaml scipy && \
-     /opt/conda/bin/conda install -y pytorch-nightly-cpu -c pytorch && \
+     /opt/conda/bin/conda install -y pytorch-cpu==1.0.1 -c pytorch && \
      /opt/conda/bin/conda clean -ya && \
      /opt/conda/bin/pip install grpcio-tools torchvision_nightly && \
      cd models/resnet18 && /opt/conda/bin/python resnet_trace.py && \
      rm -rf ../vgg16 && \
+     rm -rf ../resnet101 && \
      rm -rf /opt/conda && \
      rm -rf ~/.torch && \
      rm -rf ~/.cache
