@@ -10,7 +10,7 @@ Thanks for all the users that opened issues and contributors who helped with thi
 
 Changes in this release:
 
-    - **[Enhancement]**: using PyTorch 1.0.1 now, latest stable release (`#19 <https://github.com/perone/euclidesdb/issues/19>`_);
+	- **[Enhancement]**: using PyTorch 1.0.1 now, latest stable release (`#19 <https://github.com/perone/euclidesdb/issues/19>`_);
 	- **[Enhancement]**: examples doesn't require ``torchvision`` anymore (`#8 <https://github.com/perone/euclidesdb/pull/8>`_);
 	- **[Bug]**: wrong model name in client call can cause the server to quit (`#1 <https://github.com/perone/euclidesdb/issues/1>`_);
 	- **[Enhancement]**: major refactoring of indexing types, they're now called **Search Engines** and have their own units and configuration;
