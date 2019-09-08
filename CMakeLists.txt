@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.9)
+cmake_minimum_required(VERSION 3.12)
 
 project(euclidesdb CXX)
 
@@ -24,12 +24,26 @@ list(APPEND CMAKE_PREFIX_PATH ./libtorch)
 include(TargetCopyFiles)
 
 # ----[ Requirements
+find_package(OpenMP)
+
+if((NOT OPENMP_FOUND) AND (NOT OPENMP_CXX_FOUND) AND EXISTS "/usr/local/opt/libomp/lib/libomp.dylib")
+        set(OpenMP_CXX_FLAGS "-Xpreprocessor -fopenmp -I/usr/local/opt/libomp/include")
+        set(OpenMP_CXX_LIB_NAMES omp)
+        set(OpenMP_omp_LIBRARY /usr/local/opt/libomp/lib/libomp.dylib)
+
+        find_package(OpenMP)
+        if (OPENMP_FOUND OR OPENMP_CXX_FOUND)
+            message(STATUS "Found libomp in homebrew default location.")
+        else()
+            message(FATAL_ERROR "Didn't find libomp. Tried homebrew default location but also didn't find it.")
+        endif()
+endif()
+
 find_package(Protobuf REQUIRED)
 find_package(GRPC REQUIRED)
 find_package(LevelDB REQUIRED)
 find_package(Torch REQUIRED)
 find_package(PythonInterp 3.6 REQUIRED)
-find_package(OpenMP REQUIRED)
 find_package(BLAS REQUIRED)
 
 # ---[ gRPC Protocols
