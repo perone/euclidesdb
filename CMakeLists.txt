@@ -4,7 +4,7 @@ project(euclidesdb CXX)
 
 # ----[ Project versioning
 set(EUCLIDESDB_VERSION_MAJOR 0)
-set(EUCLIDESDB_VERSION_MINOR 2)
+set(EUCLIDESDB_VERSION_MINOR 3)
 set(EUCLIDESDB_VERSION_PATCH 0)
 set(EUCLIDESDB_VERSION_STRING ${EUCLIDESDB_VERSION_MAJOR}.${EUCLIDESDB_VERSION_MINOR}.${EUCLIDESDB_VERSION_PATCH})
 
@@ -25,20 +25,6 @@ include(TargetCopyFiles)
 
 # ----[ Requirements
 find_package(OpenMP)
-
-if((NOT OPENMP_FOUND) AND (NOT OPENMP_CXX_FOUND) AND EXISTS "/usr/local/opt/libomp/lib/libomp.dylib")
-        set(OpenMP_CXX_FLAGS "-Xpreprocessor -fopenmp -I/usr/local/opt/libomp/include")
-        set(OpenMP_CXX_LIB_NAMES omp)
-        set(OpenMP_omp_LIBRARY /usr/local/opt/libomp/lib/libomp.dylib)
-
-        find_package(OpenMP)
-        if (OPENMP_FOUND OR OPENMP_CXX_FOUND)
-            message(STATUS "Found libomp in homebrew default location.")
-        else()
-            message(FATAL_ERROR "Didn't find libomp. Tried homebrew default location but also didn't find it.")
-        endif()
-endif()
-
 find_package(Protobuf REQUIRED)
 find_package(GRPC REQUIRED)
 find_package(LevelDB REQUIRED)
@@ -126,16 +112,9 @@ add_executable(${PROJECT_NAME}
 target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic -Wno-unused-parameter)
 
 # ----[ Add the ./lib to the RPATH for Apple and Unix
-if(APPLE)
-    set_target_properties(${PROJECT_NAME} PROPERTIES
-        MACOSX_RPATH 1
-        BUILD_WITH_INSTALL_RPATH 1
-        INSTALL_RPATH "@loader_path/lib")
-elseif(UNIX)
-    set_target_properties(${PROJECT_NAME} PROPERTIES
-        BUILD_WITH_INSTALL_RPATH 1
-        INSTALL_RPATH "lib")
-endif()
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    BUILD_WITH_INSTALL_RPATH 1
+    INSTALL_RPATH "lib")
 
 # ----[ Directives fro easyloggingcpp
 target_compile_options(${PROJECT_NAME} PRIVATE -DELPP_FEATURE_PERFORMANCE_TRACKING -DELPP_THREAD_SAFE)
@@ -161,13 +140,8 @@ add_custom_command(TARGET ${PROJECT_NAME} PRE_LINK
 install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION euclidesdb)
 
 # ----[ Copy libtorch libraries
-if(APPLE)
-    install(DIRECTORY ${CMAKE_SOURCE_DIR}/libtorch/lib DESTINATION euclidesdb
-            FILES_MATCHING PATTERN "*.dylib")
-elseif(UNIX)
-    install(DIRECTORY ${CMAKE_SOURCE_DIR}/libtorch/lib DESTINATION euclidesdb
-            FILES_MATCHING PATTERN "*.so*")
-endif()
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/libtorch/lib DESTINATION euclidesdb
+        FILES_MATCHING PATTERN "*.so*")
 
 # ----[ Copy the models and sample config
 install(DIRECTORY ${CMAKE_SOURCE_DIR}/models DESTINATION euclidesdb
@@ -194,9 +168,5 @@ set(CPACK_PACKAGE_INSTALL_DIRECTORY "euclidesdb")
 set(CPACK_PACKAGE_CONTACT "christian.perone@gmail.com")
 
 set(CPACK_GENERATOR "TGZ;ZIP;STGZ")
-
-if(APPLE)
-    set(CPACK_GENERATOR "${CPACK_GENERATOR};DragNDrop")
-endif()
 
 include(CPack)
