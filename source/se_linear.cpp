@@ -69,8 +69,8 @@ SELinear::search(const std::string &model_name,
             const int features_size = vector.mutable_features()->size();
 
             torch::Tensor squeeze_tensor = features_tensor.squeeze(0);
-            torch::Tensor tensor = torch::CPU(torch::kFloat).\
-                tensorFromBlob(raw_vector, {features_size});
+            torch::Tensor tensor = torch::from_blob(raw_vector, {features_size});
+            tensor = tensor.toType(at::kFloat);
 
             if(tensor.sizes() != squeeze_tensor.sizes())
             {

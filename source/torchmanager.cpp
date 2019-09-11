@@ -13,7 +13,7 @@ void TorchManager::addModule(const string &module_name,
         const string &file_name)
 {
     TorchManager::torchmodule_t module = \
-        torch::jit::load(file_name);
+        std::make_shared<torch::jit::script::Module>(torch::jit::load(file_name));
 
     if(module == nullptr)
         LOG(FATAL) << "Unable to load module " << file_name;

@@ -27,8 +27,9 @@ torch::Tensor image_from_memory(const std::string &data)
     if(pixel_data == nullptr)
         return torch::Tensor();
 
-    torch::Tensor tensor = torch::CPU(torch::kByte).tensorFromBlob(pixel_data, {y, x, c});
-    torch::Tensor ftensor = tensor.to(torch::kFloat);
+    torch::Tensor tensor = torch::from_blob(pixel_data, {y, x, c});
+    torch::Tensor ftensor = tensor.toType(torch::kFloat);
+
     stbi_image_free(pixel_data);
 
     // Pre-processing (and training assumption) for all models
@@ -87,8 +88,8 @@ grpc::Status SimilarServiceImpl::FindSimilarImage(grpc::ServerContext* context,
         const torch::autograd::Variable &preds_var = elements[0].toTensor();
         const torch::autograd::Variable &features_var = elements[1].toTensor();
 
-        const torch::Tensor &preds = preds_var.data();
-        const torch::Tensor &features = features_var.data();
+        const torch::Tensor &preds = preds_var.tensor_data();
+        const torch::Tensor &features = features_var.tensor_data();
 
         LOG(INFO) << "Prediction Size: " << preds.sizes();
         LOG(INFO) << "Feature Size: " << features.sizes();
@@ -158,7 +159,8 @@ grpc::Status SimilarServiceImpl::FindSimilarImageById(grpc::ServerContext* conte
 
             void *features = static_cast<void*>(iv.mutable_features()->mutable_data());
             torch::Tensor features_tensor = \
-                torch::CPU(torch::kFloat).tensorFromBlob(features, {1, iv.features_size()});
+                torch::from_blob(features, {1, iv.features_size()});
+            features_tensor = features_tensor.toType(torch::kFloat);
 
             std::vector<int> toplist;
             std::vector<float> distances;
