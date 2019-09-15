@@ -39,7 +39,7 @@ class VGG16Feature(vgg.VGG):
 def vgg16(pretrained=False, **kwargs):
     if pretrained:
         kwargs['init_weights'] = False
-    model = VGG16Feature(vgg.make_layers(vgg.cfg['D'], batch_norm=True), **kwargs)
+    model = VGG16Feature(vgg.make_layers(vgg.cfgs['D'], batch_norm=True), **kwargs)
 
     if pretrained:
         # Stitching to split the features from predictions
