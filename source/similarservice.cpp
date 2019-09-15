@@ -27,7 +27,7 @@ torch::Tensor image_from_memory(const std::string &data)
     if(pixel_data == nullptr)
         return torch::Tensor();
 
-    torch::Tensor tensor = torch::from_blob(pixel_data, {y, x, c});
+    torch::Tensor tensor = torch::from_blob(pixel_data, {y, x, c}, at::kByte);
     torch::Tensor ftensor = tensor.toType(torch::kFloat);
 
     stbi_image_free(pixel_data);
@@ -66,10 +66,8 @@ grpc::Status SimilarServiceImpl::FindSimilarImage(grpc::ServerContext* context,
     if(image_tensor.type_id() == torch::UndefinedTensorId())
         return euclides_grpc_error("Undefined tensor, cannot parse image data.");
 
-    torch::autograd::Variable var_image_tensor = \
-        torch::autograd::make_variable(image_tensor, false);
     std::vector<torch::jit::IValue> net_inputs;
-    net_inputs.push_back(var_image_tensor);
+    net_inputs.push_back(image_tensor);
 
     for(const std::string &model_name : request->models())
     {
@@ -85,11 +83,8 @@ grpc::Status SimilarServiceImpl::FindSimilarImage(grpc::ServerContext* context,
         PERFORMANCE_CHECKPOINT_WITH_ID(timerFindSimilar, "AfterInference");
         auto elements = ival.toTuple()->elements();
 
-        const torch::autograd::Variable &preds_var = elements[0].toTensor();
-        const torch::autograd::Variable &features_var = elements[1].toTensor();
-
-        const torch::Tensor &preds = preds_var.tensor_data();
-        const torch::Tensor &features = features_var.tensor_data();
+        const torch::Tensor &preds = elements[0].toTensor();
+        const torch::Tensor &features = elements[1].toTensor();
 
         LOG(INFO) << "Prediction Size: " << preds.sizes();
         LOG(INFO) << "Feature Size: " << features.sizes();
@@ -203,9 +198,8 @@ SimilarServiceImpl::AddImage(grpc::ServerContext *context,
     if(image_tensor.type_id() == torch::UndefinedTensorId())
         return euclides_grpc_error("Undefined tensor, cannot parse image data.");
 
-    torch::Tensor var_image = torch::autograd::make_variable(image_tensor);
     std::vector<torch::jit::IValue> inputs;
-    inputs.push_back(var_image);
+    inputs.push_back(image_tensor);
 
     ItemData item_data;
     item_data.set_item_id(request->image_id());
