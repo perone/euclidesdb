@@ -1,0 +1,16 @@
+language: java
+
+os: linux
+dist: trusty
+jdk: oraclejdk8
+# https://github.com/grpc/grpc-java/issues/3633
+# https://github.com/grpc/grpc-java/issues/5343
+
+before_install:
+  - wget http://services.gradle.org/distributions/gradle-5.6-bin.zip
+  - unzip -qq gradle-5.6-bin.zip
+  - export GRADLE_HOME=$PWD/gradle-5.6
+  - export PATH=$GRADLE_HOME/bin:$PATH
+  - gradle -v
+
+script: cd java && gradle build

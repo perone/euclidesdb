@@ -1,0 +1,54 @@
+apply plugin: 'java'
+apply plugin: 'application'
+
+mainClassName = 'org.euclidesdb.Client'
+
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+  compile 'io.grpc:grpc-netty:1.26.0',
+          'io.grpc:grpc-protobuf:1.26.0',
+          'io.grpc:grpc-stub:1.26.0',
+          'org.imgscalr:imgscalr-lib:4.2'
+
+  testCompile 'junit:junit:4.12'
+}
+
+buildscript {
+  repositories {
+    mavenCentral()
+  }
+  dependencies {
+    classpath 'com.google.protobuf:protobuf-gradle-plugin:0.8.11'
+  }
+}
+
+jar {
+  baseName 'euclidesdb-client'
+  version '0.2.0'
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+apply plugin: 'com.google.protobuf'
+
+protobuf {
+  protoc {
+    artifact = "com.google.protobuf:protoc:3.11.2"
+  }
+  plugins {
+    grpc {
+      artifact = "io.grpc:protoc-gen-grpc-java:1.26.0"
+    }
+  }
+  generateProtoTasks {
+    all()*.plugins {
+      grpc {
+        option "enable_deprecated=false"
+      }
+    }
+  }
+}
